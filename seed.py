@@ -17,5 +17,9 @@ s1=Students(email="angryteen@students.com",username="RonWeasley",password=passwo
 s2=Students(email="teachme@students.com",username="HarryPotter",password=password)
 s3=Students(email="hottopc@students.com",username="HermioneGranger",password=password)
 
+t1.students.append(s1)
+t2.students.append(s2)
+t3.students.append(s3)
+
 db.session.add_all([t1,t2,t3,s1,s2,s3])
 db.session.commit()

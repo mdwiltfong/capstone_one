@@ -10,7 +10,7 @@ def connect_db(app):
     db.app = app
     db.init_app(app)
 
-    
+
 class Teachers(db.Model):
     __tablename__='teachers'
 
@@ -38,6 +38,11 @@ class Teachers(db.Model):
 
     def __repr__(self):
         return f"<Teacher #{self.id}: {self.username}, {self.email}>"
+    
+    students=db.relationship('Students',
+                            secondary='teachers_students',
+                            backref='teachers'
+    )
 
 
 
@@ -72,3 +77,16 @@ class Students(db.Model):
 
     def __repr__(self):
         return f"<Student #{self.id}: {self.username}, {self.email}>"
+
+
+class Teachers_Students(db.Model):
+    __tablename__='teachers_students'
+
+    teacher_id=db.Column(db.Integer,
+                        db.ForeignKey("teachers.id"),
+                        primary_key=True
+            )
+    student_id=db.Column(db.Integer,
+                        db.ForeignKey("students.id"),
+                        primary_key=True
+    )

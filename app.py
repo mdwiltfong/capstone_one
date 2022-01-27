@@ -17,6 +17,7 @@ stripe.api_key=API_KEY
 
 app = Flask(__name__)
 connect_db(app)
+db.drop_all()
 db.create_all()
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     os.environ.get('DATABASE_URL', 'postgresql:///teach'))
