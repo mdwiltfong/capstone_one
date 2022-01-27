@@ -55,6 +55,15 @@ class Student(db.Model):
         primary_key=True
     )
 
+    first_name=db.Column(
+        db.Text, 
+        nullable=False
+    )
+
+    last_name=db.Column(
+        db.Text,
+        nullable=False
+    )
     email = db.Column(
         db.Text,
         nullable=False,

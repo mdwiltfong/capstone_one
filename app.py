@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, flash, redirect, session, g,a
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db
+from forms import AddCustomer
 import stripe
 
 
@@ -32,3 +33,11 @@ toolbar = DebugToolbarExtension(app)
 @app.route('/')
 def homepage():
     return render_template('index.html',message='Hey')
+
+
+@app.route('/customers/add',methods=["GET","POST"])
+def add_customer():
+    form=AddCustomer()
+
+    return render_template('add_customer.html',form=form)
+    
