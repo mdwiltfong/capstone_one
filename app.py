@@ -38,6 +38,7 @@ def homepage():
 @app.route('/customers/add',methods=["GET","POST"])
 def add_customer():
     form=AddCustomer()
+    
 
     return render_template('add_customer.html',form=form)
     
