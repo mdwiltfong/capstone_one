@@ -4,7 +4,7 @@ from dotenv import load_dotenv, find_dotenv
 from flask import Flask, render_template, request, flash, redirect, session, g,abort
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-from models import Teachers, Students,db,connect_db
+from models import Teacher, Student,db,connect_db
 import stripe
 
 
