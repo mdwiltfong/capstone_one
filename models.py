@@ -6,7 +6,11 @@ from flask_sqlalchemy import SQLAlchemy
 bcrypt = Bcrypt()
 db = SQLAlchemy()
 
+def connect_db(app):
+    db.app = app
+    db.init_app(app)
 
+    
 class Teachers(db.Model):
     __tablename__='teachers'
 

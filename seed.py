@@ -1,4 +1,4 @@
-from models import Teachers, Students
+from models import Teachers, Students,db,connect_db
 from app import app
 from flask_bcrypt import Bcrypt
 
@@ -7,11 +7,11 @@ bcrypt=Bcrypt()
 db.drop_all()
 db.create_all()
 
-password=bcrypt.generate_password_hash('123456').decode('UTF-9')
+password=bcrypt.generate_password_hash('123456').decode('UTF-8')
 
-t1=Teachers(email='teach@teacher.com', username='homeworkqueen92', password=password)
-t2=Teachers(email='teach@teacher.com', username='YourIdealTeacher', password=password)
-t3=Teachers(email='teach@teacher.com', username='ProfessorMcGonagall', password=password)
+t1=Teachers(email='teach1@teacher.com', username='homeworkqueen92', password=password)
+t2=Teachers(email='teach2@teacher.com', username='YourIdealTeacher', password=password)
+t3=Teachers(email='teach3@teacher.com', username='ProfessorMcGonagall', password=password)
 
 s1=Students(email="angryteen@students.com",username="RonWeasley",password=password)
 s2=Students(email="teachme@students.com",username="HarryPotter",password=password)

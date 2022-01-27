@@ -4,7 +4,10 @@ from dotenv import load_dotenv, find_dotenv
 from flask import Flask, render_template, request, flash, redirect, session, g,abort
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
+from models import Teachers, Students,db,connect_db
 import stripe
+
+
 
 load_dotenv(find_dotenv())
 
@@ -13,7 +16,8 @@ API_KEY=os.getenv('API_KEY')
 stripe.api_key=API_KEY
 
 app = Flask(__name__)
-
+connect_db(app)
+db.create_all()
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     os.environ.get('DATABASE_URL', 'postgresql:///teach'))
 
