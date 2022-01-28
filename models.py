@@ -89,6 +89,17 @@ class Student(db.Model):
 
     address=db.relationship("Address")
 
+    @classmethod
+    def signup(cls,username,email,password,first_name,last_name):
+        hashed_pwd=bcrypt.generate_password_hash(password).decode('UTF-8')
+        new_user=Student(
+            username=username,
+            email=email,
+            password=hashed_pwd,
+            first_name=first_name,
+            last_name=last_name            
+        )
+
 class Teacher_Student(db.Model):
     __tablename__='teachers_students'
 

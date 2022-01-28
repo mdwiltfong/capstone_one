@@ -38,7 +38,10 @@ def homepage():
 @app.route('/customers/add',methods=["GET","POST"])
 def add_customer():
     form=AddCustomer()
-    
-
+    if form.validate_on_submit():
+        Student.signup(form.username.data,form.email.data,form.password.data,form.first_name.data,form.last_name.data)
+        db.session.commit()
+        flash('Welcome!')
+        return render_template('homepage.html')
     return render_template('add_customer.html',form=form)
     

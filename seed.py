@@ -13,9 +13,9 @@ t1=Teacher(email='teach1@teacher.com', username='homeworkqueen92', password=pass
 t2=Teacher(email='teach2@teacher.com', username='YourIdealTeacher', password=password)
 t3=Teacher(email='teach3@teacher.com', username='ProfessorMcGonagall', password=password)
 
-s1=Student(email="angryteen@students.com",username="RonWeasley",password=password)
-s2=Student(email="teachme@students.com",username="HarryPotter",password=password)
-s3=Student(email="hottopc@students.com",username="HermioneGranger",password=password)
+s1=Student(first_name='Ron',last_name='Weasley',email="angryteen@students.com",username="RonWeasley",password=password)
+s2=Student(first_name='Harry', last_name='Potter',email="teachme@students.com",username="HarryPotter",password=password)
+s3=Student(first_name='Hermione',last_name='Granger',email="hottopc@students.com",username="HermioneGranger",password=password)
 
 a1=Address(city='Devon',country='EN',address_1='Ottery St Catchpole',postal_code='12345',state='ON')
 s1.address.append(a1)
