@@ -35,10 +35,54 @@ def homepage():
     return render_template('index.html',message='Hey')
 
 
-@app.route('/customers/add',methods=["GET","POST"])
+@app.route('/get-started/auth',methods=["GET","POST"])
 def add_customer():
     form=AddCustomer()
     if form.validate_on_submit():
-        print(form)
+        try:
+            new_student=Student.signup(
+                username=form.username.data,
+                email=form.email.data,
+                password=form.password.data,
+                last_name=form.last_name.data,
+                first_name=form.first_name.data
+            )
+
+            db.session.commit()
+
+            session["curr_user"]=new_student.id
+
+            return redirect('/get-started/payment')
+        except IntegrityError as err:
+            db.session.rollback()
+            existing = Student.query.filter_by(email=form.email.data).one()
+            flash('* EMAIL IN USE: {} *'.format(existing.email))
+            return redirect('/get-started/auth')
+
     return render_template('add_customer.html',form=form)
-    
+
+@app.route('/get-started/payment',methods=["GET","POST"])
+def customer_billing():
+    form=AddCustomer()
+        if "curr_user" in session:
+                    student=Student.query.get(session["curr_user"])
+        else:
+            flash('You need to be logged in')
+            return redirect('/')
+
+    if form.validate_on_submit():
+            new_address=Address.signup(
+                city=form.city.data,
+                country=form.country.data,
+                address_1=form.address_1.data,
+                address_2=form.address_2.data,
+                postal_code=form.postal_code.data,
+                state=form.state.data
+            )
+            student.address.append(new_address)
+            db.session.add(student)
+            db.session.commit()
+            flash("You've registered!")            
+            return redirect('/')
+    return render_template('add_payment_details.html',form=AddCustomer)
+            

@@ -10,8 +10,10 @@ class AddCustomer(FlaskForm):
     email=StringField("Email", validators=[InputRequired(),Email()])
     username=StringField("Username", validators=[InputRequired()])
     password=PasswordField("Password",validators=[InputRequired()])
+    
+class CustomerAddress(FlaskForm):    
     city=StringField("City",validators=[InputRequired()])
-    state=SelectField("Country",choices=dict_to_list(US_STATES),validators=[InputRequired()])
+    state=SelectField("State",choices=dict_to_list(US_STATES),validators=[InputRequired()])
 
 
 

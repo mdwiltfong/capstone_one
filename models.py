@@ -56,7 +56,8 @@ class Student(db.Model):
     )
 
     stripe_id=db.Column(
-        db.Text
+        db.Text,
+        nullable=True
     )
     first_name=db.Column(
         db.Text, 
@@ -102,14 +103,12 @@ class Student(db.Model):
             first_name=first_name,
             last_name=last_name            
         )
-        student_address=Address(
-            
-        )
         db.session.add(new_student)
+        return new_student
+
 
 class Teacher_Student(db.Model):
     __tablename__='teachers_students'
-
     teacher_id=db.Column(db.Integer,
                         db.ForeignKey("teachers.id"),
                         primary_key=True
@@ -128,7 +127,8 @@ class Address(db.Model):
     )
 
     student_id=db.Column(db.Integer,
-                        db.ForeignKey("students.id")
+                        db.ForeignKey("students.id"),
+                        unique=True
     )
 
     city=db.Column(
@@ -164,5 +164,16 @@ class Address(db.Model):
     def __repr__(self):
         return f"<Address #{self.id}: {self.student_id}, {self.id}>"
 
-    
+    @classmethod
+    def signup(cls,city,country,address_1,address_2,postal_code,state):
+        
+        new_address=Address(
+            city=city,
+            country=country,
+            address_1=address_1,
+            address_2=address_2,
+            postal_code=postal_code,
+            state=state           
+        )
+        
 
