@@ -2,6 +2,14 @@ from datetime import datetime
 
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
+import stripe
+import os
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
+
+API_KEY=os.getenv('API_KEY')
+
+stripe.api_key=API_KEY
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
@@ -91,7 +99,7 @@ class Student(db.Model):
     def __repr__(self):
         return f"<Student #{self.id}: {self.username}, {self.email}>"
 
-    address=db.relationship("Address",cascade="delete")
+    address=db.relationship("Address")
 
     @classmethod
     def signup(cls,username,email,password,first_name,last_name):
@@ -105,7 +113,30 @@ class Student(db.Model):
         )
         db.session.add(new_student)
         return new_student
-
+    @classmethod
+    def stripe_signup(cls,student):
+        try:
+            customer=stripe.Customer.create(
+                name= f'{student.first_name} {student.last_name}',
+                email=student.email,
+                metadata={
+                    "username": student.username
+                },
+                address={
+                    "city":student.address[0].city,
+                    "country": 'US',
+                    "line1":student.address[0].address_1,
+                    "line2":student.address[0].address_2,
+                    "postal_code":student.address[0].postal_code,
+                    "state":student.address[0].state
+                }
+            )
+            print(customer)
+            return customer
+        except Exception as err:
+            print(err)
+        else:
+            print("Stripe Sign On done")
 
 class Teacher_Student(db.Model):
     __tablename__='teachers_students'
@@ -127,8 +158,7 @@ class Address(db.Model):
     )
 
     student_id=db.Column(db.Integer,
-                        db.ForeignKey("students.id"),
-                        unique=True
+                        db.ForeignKey("students.id",ondelete="cascade")
     )
 
     city=db.Column(
@@ -163,18 +193,5 @@ class Address(db.Model):
 
     def __repr__(self):
         return f"<Address #{self.id}: {self.student_id}, {self.id}>"
-
-    @classmethod
-    def signup(cls,city,country,address_1,postal_code,state,address_2=None):
-        
-        new_address=Address(
-            city=city,
-            country=country,
-            address_1=address_1,
-            address_2=address_2,
-            postal_code=postal_code,
-            state=state           
-        )
-        return new_address
 
 

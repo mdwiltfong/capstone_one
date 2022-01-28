@@ -1,6 +1,7 @@
 
 import os
 
+
 from flask import Flask, render_template, request, flash, redirect, session, g,abort
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
@@ -67,7 +68,7 @@ def customer_billing():
         return redirect('/')
 
     if form.validate_on_submit():
-            new_address=Address.signup(
+            new_address=Address(
                 city=form.city.data,
                 country=form.country.data,
                 address_1=form.address_1.data,
@@ -76,8 +77,10 @@ def customer_billing():
                 address_2= form.address_2.data or None
             )
             student.address.append(new_address)
+
             db.session.add(student)
             db.session.commit()
+            new_stripe_customer=Student.stripe_signup(student)
             flash("You've registered!")            
             return redirect('/')
     return render_template('add_payment_details.html',form=form)
