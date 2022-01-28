@@ -91,7 +91,7 @@ class Student(db.Model):
     def __repr__(self):
         return f"<Student #{self.id}: {self.username}, {self.email}>"
 
-    address=db.relationship("Address")
+    address=db.relationship("Address",cascade="delete")
 
     @classmethod
     def signup(cls,username,email,password,first_name,last_name):
@@ -176,4 +176,5 @@ class Address(db.Model):
             state=state           
         )
         return new_address
+
 

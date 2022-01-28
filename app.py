@@ -1,5 +1,5 @@
+
 import os
-from dotenv import load_dotenv, find_dotenv
 
 from flask import Flask, render_template, request, flash, redirect, session, g,abort
 from flask_debugtoolbar import DebugToolbarExtension
@@ -10,11 +10,7 @@ import stripe
 
 
 
-load_dotenv(find_dotenv())
 
-API_KEY=os.getenv('API_KEY')
-
-stripe.api_key=API_KEY
 
 app = Flask(__name__)
 connect_db(app)
