@@ -4,8 +4,8 @@ from dotenv import load_dotenv, find_dotenv
 from flask import Flask, render_template, request, flash, redirect, session, g,abort
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-from models import Teacher, Student,db,connect_db
-from forms import AddCustomer
+from models import Teacher, Student,db,connect_db, Address
+from forms import AddCustomer,CustomerAddress
 import stripe
 
 
@@ -63,26 +63,26 @@ def add_customer():
 
 @app.route('/get-started/payment',methods=["GET","POST"])
 def customer_billing():
-    form=AddCustomer()
-        if "curr_user" in session:
-                    student=Student.query.get(session["curr_user"])
-        else:
-            flash('You need to be logged in')
-            return redirect('/')
+    form=CustomerAddress()
+    if "curr_user" in session:
+        student=Student.query.get(session["curr_user"])
+    else:
+        flash('You need to be logged in')
+        return redirect('/')
 
     if form.validate_on_submit():
             new_address=Address.signup(
                 city=form.city.data,
                 country=form.country.data,
                 address_1=form.address_1.data,
-                address_2=form.address_2.data,
                 postal_code=form.postal_code.data,
-                state=form.state.data
+                state=form.state.data,
+                address_2= form.address_2.data or None
             )
             student.address.append(new_address)
             db.session.add(student)
             db.session.commit()
             flash("You've registered!")            
             return redirect('/')
-    return render_template('add_payment_details.html',form=AddCustomer)
+    return render_template('add_payment_details.html',form=form)
             

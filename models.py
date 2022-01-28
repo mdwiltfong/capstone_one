@@ -137,7 +137,7 @@ class Address(db.Model):
     )
 
     country=db.Column(
-        db.String(2),
+        db.String(50),
         nullable=False
     )
 
@@ -165,7 +165,7 @@ class Address(db.Model):
         return f"<Address #{self.id}: {self.student_id}, {self.id}>"
 
     @classmethod
-    def signup(cls,city,country,address_1,address_2,postal_code,state):
+    def signup(cls,city,country,address_1,postal_code,state,address_2=None):
         
         new_address=Address(
             city=city,
@@ -175,5 +175,5 @@ class Address(db.Model):
             postal_code=postal_code,
             state=state           
         )
-        
+        return new_address
 

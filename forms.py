@@ -14,6 +14,11 @@ class AddCustomer(FlaskForm):
 class CustomerAddress(FlaskForm):    
     city=StringField("City",validators=[InputRequired()])
     state=SelectField("State",choices=dict_to_list(US_STATES),validators=[InputRequired()])
+    country=StringField("Country",validators=[InputRequired()])
+    address_1=StringField("Address Line 1",validators=[InputRequired()])
+    address_2=StringField("Address Line 2",validators=[Optional()])
+    postal_code=StringField("Postal Code",validators=[InputRequired()])
+
 
 
 
