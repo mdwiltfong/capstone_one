@@ -55,6 +55,9 @@ class Student(db.Model):
         primary_key=True
     )
 
+    stripe_id=db.Column(
+        db.Text
+    )
     first_name=db.Column(
         db.Text, 
         nullable=False
@@ -92,13 +95,17 @@ class Student(db.Model):
     @classmethod
     def signup(cls,username,email,password,first_name,last_name):
         hashed_pwd=bcrypt.generate_password_hash(password).decode('UTF-8')
-        new_user=Student(
+        new_student=Student(
             username=username,
             email=email,
             password=hashed_pwd,
             first_name=first_name,
             last_name=last_name            
         )
+        student_address=Address(
+            
+        )
+        db.session.add(new_student)
 
 class Teacher_Student(db.Model):
     __tablename__='teachers_students'
