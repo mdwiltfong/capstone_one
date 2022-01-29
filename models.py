@@ -102,14 +102,12 @@ class Student(db.Model):
     address=db.relationship("Address")
 
     @classmethod
-    def signup(cls,username,email,password,first_name,last_name):
+    def signup(cls,username,email,password):
         hashed_pwd=bcrypt.generate_password_hash(password).decode('UTF-8')
         new_student=Student(
             username=username,
             email=email,
-            password=hashed_pwd,
-            first_name=first_name,
-            last_name=last_name            
+            password=hashed_pwd          
         )
         db.session.add(new_student)
         return new_student

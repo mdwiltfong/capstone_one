@@ -5,7 +5,7 @@ from flask import Flask, render_template, request, flash, redirect, session, g,a
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db, Address
-from forms import AddCustomer,CustomerAddress
+from forms import AddCustomer,PaymentDetails
 import stripe
 
 
@@ -39,9 +39,7 @@ def add_customer():
             new_student=Student.signup(
                 username=form.username.data,
                 email=form.email.data,
-                password=form.password.data,
-                last_name=form.last_name.data,
-                first_name=form.first_name.data
+                password=form.password.data
             )
 
             db.session.commit()
@@ -60,7 +58,7 @@ def add_customer():
 
 @app.route('/get-started/payment',methods=["GET","POST"])
 def customer_billing():
-    form=CustomerAddress()
+    form=PaymentDetails()
     if "curr_user" in session:
         student=Student.query.get(session["curr_user"])
     else:
