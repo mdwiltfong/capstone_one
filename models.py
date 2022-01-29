@@ -140,11 +140,11 @@ class Student(db.Model):
 class Teacher_Student(db.Model):
     __tablename__='teachers_students'
     teacher_id=db.Column(db.Integer,
-                        db.ForeignKey("teachers.id"),
+                        db.ForeignKey("teachers.id", ondelete="cascade"),
                         primary_key=True
             )
     student_id=db.Column(db.Integer,
-                        db.ForeignKey("students.id"),
+                        db.ForeignKey("students.id",ondelete="cascade"),
                         primary_key=True
     )
 
