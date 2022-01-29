@@ -50,7 +50,8 @@ def add_customer():
             session["curr_user"]=new_student.id
 
             return redirect('/get-started/payment')
-        except IntegrityError as err:
+            
+        except IntegrityError:
             db.session.rollback()
             existing = Student.query.filter_by(email=form.email.data).one()
             flash('* EMAIL IN USE: {} *'.format(existing.email))
@@ -81,6 +82,8 @@ def customer_billing():
             db.session.add(student)
             db.session.commit()
             new_stripe_customer=Student.stripe_signup(student)
+            
+            print(new_stripe_customer)
             flash("You've registered!")            
             return redirect('/')
     return render_template('add_payment_details.html',form=form)

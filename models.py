@@ -113,6 +113,8 @@ class Student(db.Model):
         )
         db.session.add(new_student)
         return new_student
+
+        ## TO-DO: add more error handling to this method versus on ther server. Throw-catch methodology. 
     @classmethod
     def stripe_signup(cls,student):
         try:
