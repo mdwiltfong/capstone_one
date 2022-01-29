@@ -29,16 +29,20 @@ class OnBoarding(TestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertIn("/get-started/payment",request.path)
             self.assertIsNotNone(session['curr_user'])
-    def test_payment_details(self):
+    def test_stripe_paymentmethod(self):
         with app.test_client() as client:
             with client.session_transaction() as sess:
-                sess['curr_user']=4
+                s=Student.query.filter_by(username='testers92').first()
+                sess['curr_user']=s.id
                 resp=client.post("/get-started/payment",data={
                     "name":"Test User",
                     "city":"Test City",
                     "country":"US",
                     "line1":"Test Street"
                 })
+                self.assertEqual(resp.status_code, 200)
+                self.assertIsNotNone(s.stripe_id)
+
 
 
         

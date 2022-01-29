@@ -100,7 +100,7 @@ class Student(db.Model):
 
         ## TO-DO: add more error handling to this method versus on ther server. Throw-catch methodology. 
     @classmethod
-    def stripe_signup(cls,student):
+    def stripe_signup(cls,student,form):
         try:
             customer=stripe.Customer.create(
                 name= student.address[0].name,
@@ -118,15 +118,6 @@ class Student(db.Model):
                     "state":student.address[0].state
                 }
             )
-            return customer
-        except Exception as err:
-            print(err)
-        else:
-            print("Stripe Sign On done")
-    
-    @classmethod
-    def stripe_paymentmethod(cls,student,cc_number,exp_month,exp_year):
-        try:
             student_address=student.address[0]
             card=stripe.PaymentMethod.create(
                     type="card",
@@ -141,14 +132,26 @@ class Student(db.Model):
                         }
                     },
                     card={
-                        "number": cc_number,
-                        "exp_month":exp_month,
-                        "exp_year":exp_year
+                        "number": form.cc_number.data,
+                        "exp_month":form.exp_month.data,
+                        "exp_year":form.exp_year.data
                     }
+                ) or None
+            if card:
+                    payment_method=stripe.PaymentMethod.attach(
+                    card.id,
+                    customer=student.stripe_id
                 )
-            print(card)
-        except:
-            print(Exception.args)
+            return {
+                "customer":customer,
+                "card":card,
+                "payment_method":payment_method
+            }
+        except Exception as err:
+            print(err)
+        else:
+            print("Stripe Sign On done")
+
     @classmethod
     def authentication(cls,username,password):
       
