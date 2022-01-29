@@ -12,7 +12,6 @@ app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
 class OnBoarding(TestCase):
     def setUp(self):
         """ Creates Student """
-        Student.query.delete()
 
         s1=Student(email="test@students.com",username="tester92",password="123456")
         db.session.add(s1)
@@ -30,4 +29,16 @@ class OnBoarding(TestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertIn("/get-started/payment",request.path)
             self.assertIsNotNone(session['curr_user'])
+    def test_payment_details(self):
+        with app.test_client() as client:
+            with client.session_transaction() as sess:
+                sess['curr_user']=4
+                resp=client.post("/get-started/payment",data={
+                    "name":"Test User",
+                    "city":"Test City",
+                    "country":"US",
+                    "line1":"Test Street"
+                })
+
+
         
