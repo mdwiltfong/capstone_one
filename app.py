@@ -92,8 +92,17 @@ def logout():
         flash("See you next time!","success")
         return redirect("/")
 
-@app.route("/login")
+@app.route("/login", methods=["GET","POST"])
 def login():
     form=StudentLogin()
+    if form.validate_on_submit():
+        password=form.password.data
+        username=form.username.data
+        if Student.authentication(username,password):
+            flash("You've logged in!","success")
+            return redirect("/")
+        else:
+            flash("Hmmm, password or username are incorrect")
+            return redirect("/login")
     
     return render_template("login.html",form=form)
