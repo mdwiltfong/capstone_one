@@ -137,6 +137,17 @@ class Student(db.Model):
             print(err)
         else:
             print("Stripe Sign On done")
+    @classmethod
+    def authentication(cls,username,password):
+      
+            student=Student.query.filter_by(username=username).first()
+            is_auth = bcrypt.check_password_hash(student.password, password)
+            print(is_auth)
+            if is_auth:
+                return student
+            return False
+
+
 
 class Teacher_Student(db.Model):
     __tablename__='teachers_students'

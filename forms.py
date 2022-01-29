@@ -22,6 +22,8 @@ class PaymentDetails(FlaskForm):
     postal_code=StringField("Postal Code",validators=[InputRequired()])
 
 
-
+class StudentLogin(FlaskForm):
+    username=StringField("Username",validators=[InputRequired()])
+    password=StringField("Password",validators=[InputRequired()])
 
 

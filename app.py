@@ -5,7 +5,7 @@ from flask import Flask, render_template, request, flash, redirect, session, g,a
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db, Address
-from forms import AddCustomer,PaymentDetails
+from forms import AddCustomer,PaymentDetails,StudentLogin
 import stripe
 
 
@@ -47,7 +47,6 @@ def add_customer():
             session["curr_user"]=new_student.id
 
             return redirect('/get-started/payment')
-            
         except IntegrityError:
             db.session.rollback()
             existing = Student.query.filter_by(email=form.email.data).one()
@@ -84,4 +83,17 @@ def customer_billing():
             flash("You've registered!")            
             return redirect('/')
     return render_template('add_payment_details.html',form=form)
-            
+
+
+@app.route('/logout')
+def logout():
+    if "curr_user" in session:
+        session.pop("curr_user")
+        flash("See you next time!","success")
+        return redirect("/")
+
+@app.route("/login")
+def login():
+    form=StudentLogin()
+    
+    return render_template("login.html",form=form)
