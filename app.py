@@ -47,9 +47,10 @@ def add_customer():
             session["curr_user"]=new_student.id
 
             return redirect('/get-started/payment')
-        except IntegrityError:
+        except IntegrityError as err:
+            print(err)
             db.session.rollback()
-            existing = Student.query.filter_by(email=form.email.data).one()
+            existing = Student.query.filter_by(email=form.email.data).first()
             flash('* EMAIL IN USE: {} *'.format(existing.email))
             return redirect('/get-started/auth')
 
@@ -67,6 +68,7 @@ def customer_billing():
     if form.validate_on_submit():
             new_address=Address(
                 city=form.city.data,
+                name=form.name.data,
                 country=form.country.data,
                 address_1=form.address_1.data,
                 postal_code=form.postal_code.data,
@@ -75,12 +77,13 @@ def customer_billing():
             )
             student.address.append(new_address)
 
+            new_stripe_customer=Student.stripe_signup(student)
+            student.stripe_id=new_stripe_customer.id
             db.session.add(student)
             db.session.commit()
-            new_stripe_customer=Student.stripe_signup(student)
 
             print(new_stripe_customer)
-            flash("You've registered!")            
+            flash("You've registered!","success")            
             return redirect('/')
     return render_template('add_payment_details.html',form=form)
 

@@ -67,29 +67,16 @@ class Student(db.Model):
         db.Text,
         nullable=True
     )
-    first_name=db.Column(
-        db.Text, 
-        nullable=False
-    )
-
-    last_name=db.Column(
-        db.Text,
-        nullable=False
-    )
     email = db.Column(
         db.Text,
         nullable=False,
         unique=True,
     )
-
     username = db.Column(
         db.Text,
         nullable=False,
         unique=True,
     )
-
-    
-
     password = db.Column(
         db.Text,
         nullable=False,
@@ -117,10 +104,11 @@ class Student(db.Model):
     def stripe_signup(cls,student):
         try:
             customer=stripe.Customer.create(
-                name= f'{student.first_name} {student.last_name}',
+                name= student.address[0].name,
                 email=student.email,
                 metadata={
-                    "username": student.username
+                    "username": student.username,
+                    "db_id":student.id
                 },
                 address={
                     "city":student.address[0].city,
@@ -131,7 +119,7 @@ class Student(db.Model):
                     "state":student.address[0].state
                 }
             )
-            print(customer)
+            
             return customer
         except Exception as err:
             print(err)
@@ -170,6 +158,11 @@ class Address(db.Model):
 
     student_id=db.Column(db.Integer,
                         db.ForeignKey("students.id",ondelete="cascade")
+    )
+
+    name=db.Column(
+        db.String,
+        nullable=False
     )
 
     city=db.Column(
