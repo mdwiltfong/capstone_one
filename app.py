@@ -74,15 +74,10 @@ def customer_billing():
                 address_2= form.address_2.data or None
             )
             student.address.append(new_address)
-
             new_stripe_customer=Student.stripe_signup(student)
-            customer_card=Student.stripe_paymentmethod(student,cc_number=form.card_number.data,exp_month="01",exp_year="25")
-            print(customer_card)
-            student.stripe_id=new_stripe_customer.id
+            student.stripe_id=new_stripe_customer.customer.id
             db.session.add(student)
             db.session.commit()
-
-            print(new_stripe_customer)
             flash("You've registered!","success")            
             return redirect('/')
     return render_template('add_payment_details.html',form=form)
