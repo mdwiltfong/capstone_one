@@ -98,11 +98,13 @@ def login():
     if form.validate_on_submit():
         password=form.password.data
         username=form.username.data
-        if Student.authentication(username,password):
+        student=Student.authentication(username,password)
+        if student:
+            session["curr_user"]=student.id
             flash("You've logged in!","success")
             return redirect("/")
         else:
-            flash("Hmmm, password or username are incorrect")
+            flash("Hmmm, password or username are incorrect","danger")
             return redirect("/login")
     
     return render_template("login.html",form=form)
