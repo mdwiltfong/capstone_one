@@ -76,6 +76,8 @@ def customer_billing():
             student.address.append(new_address)
 
             new_stripe_customer=Student.stripe_signup(student)
+            customer_card=Student.stripe_paymentmethod(student,cc_number=form.card_number.data,exp_month="01",exp_year="25")
+            print(customer_card)
             student.stripe_id=new_stripe_customer.id
             db.session.add(student)
             db.session.commit()

@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 import stripe
@@ -119,12 +118,37 @@ class Student(db.Model):
                     "state":student.address[0].state
                 }
             )
-            
             return customer
         except Exception as err:
             print(err)
         else:
             print("Stripe Sign On done")
+    
+    @classmethod
+    def stripe_paymentmethod(cls,student,cc_number,exp_month,exp_year):
+        try:
+            student_address=student.address[0]
+            card=stripe.PaymentMethod.create(
+                    type="card",
+                    billing_details={
+                        "address":{
+                            "city":student_address.city,
+                            "country":"US",
+                            "line1":student_address.address_1,
+                            "line2":student_address.address_2,
+                            "postal_code":student_address.postal_code,
+                            "state":student_address.state
+                        }
+                    },
+                    card={
+                        "number": cc_number,
+                        "exp_month":exp_month,
+                        "exp_year":exp_year
+                    }
+                )
+            print(card)
+        except:
+            print(Exception.args)
     @classmethod
     def authentication(cls,username,password):
       
