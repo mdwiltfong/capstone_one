@@ -1,6 +1,5 @@
-
 import os
-
+from dotenv import load_dotenv, find_dotenv
 
 from flask import Flask, render_template, request, flash, redirect, session, g,abort
 from flask_debugtoolbar import DebugToolbarExtension
@@ -10,7 +9,7 @@ from forms import AddCustomer,CustomerAddress
 import stripe
 
 
-
+#PSQL_CONNECTION_STRING=os.getenv('PSQL_CONNECTION_STRING')
 
 
 app = Flask(__name__)
@@ -82,7 +81,7 @@ def customer_billing():
             db.session.add(student)
             db.session.commit()
             new_stripe_customer=Student.stripe_signup(student)
-            
+
             print(new_stripe_customer)
             flash("You've registered!")            
             return redirect('/')
