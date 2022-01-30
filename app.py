@@ -28,9 +28,12 @@ db.create_all()
 def homepage():
     return render_template('index.html',message='Hey')
 
+@app.route("/signup")
+def signup():
+    return render_template("signup.html",message="Hey")
 
-@app.route('/get-started/auth',methods=["GET","POST"])
-def add_customer():
+@app.route('/student/signup',methods=["GET","POST"])
+def add_student():
     form=AddCustomer()
     if form.validate_on_submit():
         try:
@@ -43,6 +46,7 @@ def add_customer():
             db.session.commit()
 
             session["curr_user"]=new_student.id
+            session["student"]=True
 
             return redirect('/get-started/payment')
         except IntegrityError as err:
@@ -52,15 +56,46 @@ def add_customer():
             flash('* EMAIL IN USE: {} *'.format(existing.email))
             return redirect('/get-started/auth')
 
-    return render_template('add_customer.html',form=form)
+    return render_template('add_student.html',form=form)
+
+@app.route('/teacher/signup',methods=["GET","POST"])
+def add_teacher():
+    form=AddCustomer()
+    if form.validate_on_submit():
+        try:
+            new_teacher=Teacher.signup(
+                username=form.username.data,
+                email=form.email.data,
+                password=form.password.data
+            )
+
+            db.session.commit()
+
+            session["curr_user"]=new_teacher.id
+            session["teacher"]=True
+
+            return redirect('/get-started/payment')
+        except IntegrityError as err:
+            print(err)
+            db.session.rollback()
+            existing = Student.query.filter_by(email=form.email.data).first()
+            flash('* EMAIL IN USE: {} *'.format(existing.email))
+            return redirect('/get-started/auth')
+
+    return render_template('add_teacher.html',form=form)
+
 
 @app.route('/get-started/payment',methods=["GET","POST"])
 def customer_billing():
     form=PaymentDetails()
-    if "curr_user" in session:
-        student=Student.query.get(session["curr_user"])
-        if student.stripe_id:
-            return redirect("/")
+
+    ''' TODO: This route needs to differentiate between students and teachers.We store whether they are students or teachers in the session, we just need to implement that logic.
+
+     '''
+    if session.get('student',None) or session.get('teacher',None):
+        client=Student.query.get(session["curr_user"]) or Teacher.query.get(session["curr_user"])
+        if client.stripe_id:
+            return redirect('/')
     else:
         flash('You need to be logged in')
         return redirect('/', code=404)
@@ -75,10 +110,10 @@ def customer_billing():
                 state=form.state.data,
                 address_2= form.address_2.data or None
             )
-            student.address.append(new_address)
-            new_stripe_customer=Student.stripe_signup(student,form)
-            student.stripe_id=new_stripe_customer["customer"].id
-            db.session.add(student)
+            client.address.append(new_address)
+            new_stripe_customer=Student.stripe_signup(client,form)
+            client.stripe_id=new_stripe_customer["customer"].id
+            db.session.add(client)
             db.session.commit()
             flash("You've registered!","success")            
             return redirect('/')
@@ -93,7 +128,7 @@ def logout():
         return redirect("/")
 
 @app.route("/student/login", methods=["GET","POST"])
-def login():
+def student_login():
     form=StudentLogin()
     if form.validate_on_submit():
         password=form.password.data
@@ -105,6 +140,24 @@ def login():
             return redirect("/")
         else:
             flash("Hmmm, password or username are incorrect","danger")
+            return redirect("/")
+    
+    return render_template("student_login.html",form=form)
+
+@app.route("/teacher/login", methods=["GET","POST"])
+def teacher_login():
+    form=StudentLogin()
+    if form.validate_on_submit():
+        password=form.password.data
+        username=form.username.data
+        teacher=Teacher.authentication(username,password)
+        if teacher:
+            session["curr_user"]=teacher.id
+            flash("You've logged in!","success")
+            return redirect("/")
+        else:
+            flash("Hmmm, password or username are incorrect","danger")
             return redirect("/login")
     
-    return render_template("login.html",form=form)
+    return render_template("teacher_login.html",form=form)
+
