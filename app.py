@@ -160,7 +160,7 @@ def teacher_login():
             return redirect("/")
         else:
             flash("Hmmm, password or username are incorrect","danger")
-            return redirect("/login")
+            return redirect("/teacher/login")
     
     return render_template("teacher_login.html",form=form)
 

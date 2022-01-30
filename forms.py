@@ -1,14 +1,14 @@
 from unicodedata import name
 from flask_wtf import FlaskForm
 from wtforms import StringField,SelectField, PasswordField, DateField
-from wtforms.validators import InputRequired, Email, Optional
+from wtforms.validators import InputRequired, Email, Optional,Length
 from countries import US_STATES,months
 from helper_functions import dict_to_list
 
 class AddCustomer(FlaskForm):
     email=StringField("Email", validators=[InputRequired(),Email()])
     username=StringField("Username", validators=[InputRequired()])
-    password=PasswordField("Password",validators=[InputRequired()])
+    password=PasswordField("Password",validators=[InputRequired(), Length(min=6,message="Password need to be 6 characters in length")])
     
 class PaymentDetails(FlaskForm):    
     name=StringField("Name (as it appears on your card)",validators=[InputRequired()])
@@ -23,7 +23,7 @@ class PaymentDetails(FlaskForm):
 
 
 class StudentLogin(FlaskForm):
-    username=StringField("Username",validators=[InputRequired()])
-    password=PasswordField("Password",validators=[InputRequired()])
+    username=StringField("Username",validators=[InputRequired("Username is Required")])
+    password=PasswordField("Password",validators=[InputRequired("Password is Required"), Length(min=6,message="Password need to be 6 characters in length")])
 
 
