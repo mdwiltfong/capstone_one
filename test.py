@@ -21,17 +21,21 @@ app.config['TESTING'] = True
 app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
 
 class OnBoarding(TestCase):
-
+    def setUp(self):
+        s1=Student(email="test@students.com",username="test01",password="123456")
+        t1=Teacher(email='testteacher1@teacher.com', username='testteacher', password="123456")
+        db.session.add_all([s1,t1])
+        db.session.commit()
     def tearDown(self):
         user=Student.query.filter_by(username="tester91").first() or Teacher.query.filter_by(username="teachertest")
         print("tearDown")
         print(user)
         if user.username == "tester91":
             db.session.query(Student).filter(Student.username=="tester91").delete()
+            db.session.commit()
         else:
             db.session.query(Teacher).filter(Teacher.username=="teachertest").delete()
-            
-
+            db.session.commit()
 
     def test_student_signup(self):
         with app.test_client() as client:
