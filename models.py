@@ -72,10 +72,11 @@ class Teacher(db.Model):
     @classmethod
     def authentication(cls,username,password):
             teacher=Teacher.query.filter_by(username=username).first()
-            is_auth = bcrypt.check_password_hash(teacher.password, password)
-            print(is_auth)
-            if is_auth:
-                return teacher
+            if teacher:
+                is_auth = bcrypt.check_password_hash(teacher.password, password)
+                print(is_auth)
+                if is_auth:
+                    return teacher
             return False
     @classmethod
     def stripe_signup(cls,teacher,form):
