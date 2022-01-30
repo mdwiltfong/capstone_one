@@ -26,7 +26,7 @@ db.create_all()
 
 @app.route('/')
 def homepage():
-    return render_template('index.html',message='Hey')
+    return render_template('index.html')
 
 @app.route("/signup")
 def signup():
