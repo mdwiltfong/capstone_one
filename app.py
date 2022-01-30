@@ -59,6 +59,8 @@ def customer_billing():
     form=PaymentDetails()
     if "curr_user" in session:
         student=Student.query.get(session["curr_user"])
+        if student.stripe_id:
+            return redirect("/")
     else:
         flash('You need to be logged in')
         return redirect('/', code=404)
@@ -90,7 +92,7 @@ def logout():
         flash("See you next time!","success")
         return redirect("/")
 
-@app.route("/login", methods=["GET","POST"])
+@app.route("/student/login", methods=["GET","POST"])
 def login():
     form=StudentLogin()
     if form.validate_on_submit():
