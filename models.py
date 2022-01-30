@@ -26,6 +26,11 @@ class Teacher(db.Model):
         primary_key=True
     )
 
+    stripe_id=db.Column(
+        db.Text,
+        nullable=True
+    )
+
     email = db.Column(
         db.Text,
         nullable=False,
@@ -215,6 +220,8 @@ class Student(db.Model):
                     card.id,
                     customer=customer.stripe_id
                 )
+            print("stripe_signup")
+            print(customer,card,payment_method)
             return {
                 "customer":customer,
                 "card":card,

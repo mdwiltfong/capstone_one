@@ -88,10 +88,14 @@ def add_teacher():
 @app.route('/get-started/payment',methods=["GET","POST"])
 def customer_billing():
     form=PaymentDetails()
-    if "curr_user" in session:
-        student=Student.query.get(session["curr_user"])
-        if student.stripe_id:
-            return redirect("/")
+
+    ''' TODO: This route needs to differentiate between students and teachers.We store whether they are students or teachers in the session, we just need to implement that logic.
+
+     '''
+    if session.get('student',None) or session.get('teacher',None):
+        client=Student.query.get(session["curr_user"]) or Teacher.query.get(session["curr_user"])
+        if client.stripe_id:
+            return redirect('/')
     else:
         flash('You need to be logged in')
         return redirect('/', code=404)
@@ -106,10 +110,10 @@ def customer_billing():
                 state=form.state.data,
                 address_2= form.address_2.data or None
             )
-            student.address.append(new_address)
-            new_stripe_customer=Student.stripe_signup(student,form)
-            student.stripe_id=new_stripe_customer["customer"].id
-            db.session.add(student)
+            client.address.append(new_address)
+            new_stripe_customer=Student.stripe_signup(client,form)
+            client.stripe_id=new_stripe_customer["customer"].id
+            db.session.add(client)
             db.session.commit()
             flash("You've registered!","success")            
             return redirect('/')
@@ -136,7 +140,7 @@ def student_login():
             return redirect("/")
         else:
             flash("Hmmm, password or username are incorrect","danger")
-            return redirect("/login")
+            return redirect("/")
     
     return render_template("student_login.html",form=form)
 
