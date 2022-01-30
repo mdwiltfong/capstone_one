@@ -78,7 +78,7 @@ def add_teacher():
         except IntegrityError as err:
             print(err)
             db.session.rollback()
-            existing = Student.query.filter_by(email=form.email.data).first()
+            existing = Teacher.query.filter_by(email=form.email.data).first()
             flash('* EMAIL IN USE: {} *'.format(existing.email))
             return redirect('/get-started/auth')
 
@@ -92,6 +92,8 @@ def customer_billing():
     ''' TODO: This route needs to differentiate between students and teachers.We store whether they are students or teachers in the session, we just need to implement that logic.
 
      '''
+
+    print('Test')
     if session.get('student',None) or session.get('teacher',None):
         client=Student.query.get(session["curr_user"]) or Teacher.query.get(session["curr_user"])
         if client.stripe_id:
@@ -111,6 +113,7 @@ def customer_billing():
                 address_2= form.address_2.data or None
             )
             client.address.append(new_address)
+            print(client,form)
             new_stripe_customer=Student.stripe_signup(client,form)
             client.stripe_id=new_stripe_customer["customer"].id
             db.session.add(client)
