@@ -6,7 +6,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db, Address
 from forms import AddCustomer,PaymentDetails,StudentLogin
-
+import pdb
 
 #PSQL_CONNECTION_STRING=os.getenv('PSQL_CONNECTION_STRING')
 
@@ -61,7 +61,7 @@ def customer_billing():
         student=Student.query.get(session["curr_user"])
     else:
         flash('You need to be logged in')
-        return redirect('/')
+        return redirect('/', code=404)
 
     if form.validate_on_submit():
             new_address=Address(
@@ -74,8 +74,8 @@ def customer_billing():
                 address_2= form.address_2.data or None
             )
             student.address.append(new_address)
-            new_stripe_customer=Student.stripe_signup(student)
-            student.stripe_id=new_stripe_customer.customer.id
+            new_stripe_customer=Student.stripe_signup(student,form)
+            student.stripe_id=new_stripe_customer["customer"].id
             db.session.add(student)
             db.session.commit()
             flash("You've registered!","success")            

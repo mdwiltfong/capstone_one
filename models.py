@@ -132,15 +132,15 @@ class Student(db.Model):
                         }
                     },
                     card={
-                        "number": form.cc_number.data,
-                        "exp_month":form.exp_month.data,
-                        "exp_year":form.exp_year.data
+                        "number": form.card_number.data,
+                        "exp_month":f"{form.expiration.data : %m}".strip(),
+                        "exp_year":f"{form.expiration.data : %y}".strip()
                     }
                 ) or None
             if card:
                     payment_method=stripe.PaymentMethod.attach(
                     card.id,
-                    customer=student.stripe_id
+                    customer=customer.stripe_id
                 )
             return {
                 "customer":customer,
