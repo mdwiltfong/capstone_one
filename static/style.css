@@ -1,25 +1,46 @@
-.content,img{
+.container{
+  width: 1500px;
+    height: 1100px;
+    display: block;
+    position: relative;
+    overflow: hidden;
+  
+}
+    
+.container img {
     display: inline-block;
     width: 100%;
     height: auto;
-    position: absolute;
+    opacity: 98%;
+    
 }
 
-.container{
-    height:338px;
-    width: 504px;
-    position: relative;
-    padding: 0px;
+.content h1{
+    z-index:100;
+    font-size: 60px;
+    color:#ffff;
+    font-family: 'Josefin Sans', sans-serif;
+position: absolute;
+bottom:680px;
+right:435px;
 }
 
 .content{
     margin: 100px 0;
 }
+
 .content span{
     width: 500px;
     height: auto;
     padding: 0 10px;
 }
-img{
-    opacity: 55%;
+
+.btn-primary{
+    color: #fff;
+    font-size: ;
+    background-color: #84878a;
+    border-color: #84878a;
 }
+
+
+

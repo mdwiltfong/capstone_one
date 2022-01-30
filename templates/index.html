@@ -3,16 +3,16 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 {% endblock stylesheet %}
 {% block title %}
-homepage
+Homepage
 {% endblock title %}
 {% block content %}
 {% for category, msg in get_flashed_messages(with_categories=true) %}
 <p class="bg-{{category}}">{{msg}}</p>
 {% endfor %}
 <div class="container">
-    <img class="inline-block" src="../static/assets/tutor-student.jpeg" alt="">
+    <img src="../static/assets/Home_Page_Image.jpg" alt="Pink shirt girl in front of laptop smiling">
     <span class="d-flex flex-column content">
-        <h1 class="text-center align-items-center">Welcome!</h1>
+        <h1 class="text-center align-items-center">WELCOME</h1>
         <span class="d-flex justify-content-between">
             <a href="/teacher/login" class="btn btn-primary">Teacher Login</a>
             <a href="/student/login" class="btn btn-primary">Student Login</a>
