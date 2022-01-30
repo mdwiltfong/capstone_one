@@ -51,7 +51,7 @@ class Teacher(db.Model):
                             backref='teachers'
     )
 
-    
+    address=db.relationship("Address")
 
 
 class Student(db.Model):
@@ -185,6 +185,10 @@ class Address(db.Model):
 
     student_id=db.Column(db.Integer,
                         db.ForeignKey("students.id",ondelete="cascade")
+    )
+
+    teacher_id=db.Column(db.Integer,
+                        db.ForeignKey("teachers.id", ondelete="cascade")
     )
 
     name=db.Column(
