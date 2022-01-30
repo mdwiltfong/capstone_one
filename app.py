@@ -143,7 +143,7 @@ def student_login():
             return redirect("/")
         else:
             flash("Hmmm, password or username are incorrect","danger")
-            return redirect("/")
+            return redirect("/student/login")
     
     return render_template("student_login.html",form=form)
 

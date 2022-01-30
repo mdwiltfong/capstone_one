@@ -237,10 +237,11 @@ class Student(db.Model):
     def authentication(cls,username,password):
       
             student=Student.query.filter_by(username=username).first()
-            is_auth = bcrypt.check_password_hash(student.password, password)
-            print(is_auth)
-            if is_auth:
-                return student
+            if student:
+                is_auth = bcrypt.check_password_hash(student.password, password)
+                print(is_auth)
+                if is_auth:
+                    return student
             return False
 
 
