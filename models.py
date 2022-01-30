@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 import stripe
@@ -101,7 +100,7 @@ class Student(db.Model):
 
         ## TO-DO: add more error handling to this method versus on ther server. Throw-catch methodology. 
     @classmethod
-    def stripe_signup(cls,student):
+    def stripe_signup(cls,student,form):
         try:
             customer=stripe.Customer.create(
                 name= student.address[0].name,
@@ -119,12 +118,40 @@ class Student(db.Model):
                     "state":student.address[0].state
                 }
             )
-            
-            return customer
+            student_address=student.address[0]
+            card=stripe.PaymentMethod.create(
+                    type="card",
+                    billing_details={
+                        "address":{
+                            "city":student_address.city,
+                            "country":"US",
+                            "line1":student_address.address_1,
+                            "line2":student_address.address_2,
+                            "postal_code":student_address.postal_code,
+                            "state":student_address.state
+                        }
+                    },
+                    card={
+                        "number": form.card_number.data,
+                        "exp_month":f"{form.expiration.data : %m}".strip(),
+                        "exp_year":f"{form.expiration.data : %y}".strip()
+                    }
+                ) or None
+            if card:
+                    payment_method=stripe.PaymentMethod.attach(
+                    card.id,
+                    customer=customer.stripe_id
+                )
+            return {
+                "customer":customer,
+                "card":card,
+                "payment_method":payment_method
+            }
         except Exception as err:
             print(err)
         else:
             print("Stripe Sign On done")
+
     @classmethod
     def authentication(cls,username,password):
       

@@ -17,7 +17,7 @@ s1=Student(email="angryteen@students.com",username="RonWeasley",password=passwor
 s2=Student(email="teachme@students.com",username="HarryPotter",password=password)
 s3=Student(email="hottopc@students.com",username="HermioneGranger",password=password)
 
-a1=Address(name="Ron Weasley",city='Devon',country='EN',address_1='Ottery St Catchpole',postal_code='12345',state='ON')
+a1=Address(name="Ron Weasley",city='Devon',country='GB',address_1='Ottery St Catchpole',postal_code='12345',state='ON')
 s1.address.append(a1)
 
 
