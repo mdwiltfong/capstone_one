@@ -30,9 +30,10 @@ right:435px;
 }
 
 .content span{
-    width: 500px;
+    width: 300px;
     height: auto;
     padding: 0 10px;
+    position: inherit;
 }
 
 .btn-primary{
