@@ -1,0 +1,25 @@
+.content,img{
+    display: inline-block;
+    width: 100%;
+    height: auto;
+    position: absolute;
+}
+
+.container{
+    height:338px;
+    width: 504px;
+    position: relative;
+    padding: 0px;
+}
+
+.content{
+    margin: 100px 0;
+}
+.content span{
+    width: 500px;
+    height: auto;
+    padding: 0 10px;
+}
+img{
+    opacity: 55%;
+}
