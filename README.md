@@ -13,14 +13,3 @@
 
 At this point your terminal is running a flask server. You should be able to see the site at `http://127.0.0.1:5000/` 
 
-
-<img class="inline-block" src="../static/assets/Home_Page_Image.jpg" alt="Pink shirt girl in front of laptop smiling">
-
-class="inline-block" 
-
-content,img{
-    display: inline-block;
-    width: 100%;
-    height: auto;
-    position: absolute;
-}

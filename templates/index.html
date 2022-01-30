@@ -7,13 +7,17 @@ Homepage
 {% endblock title %}
 {% block content %}
 {% for category, msg in get_flashed_messages(with_categories=true) %}
-<p class="bg-{{category}}">{{msg}}</p>
+<!--TODO #13 @AndreaDubuc Look at possibly having these messages slide on and off the screen through animations-->
+<div class="container d-flex justify-content-center">
+    <p class="w-25 alert alert-{{category}}">{{msg}}</p>
+
+</div>
 {% endfor %}
-<div class="container">
+<div class="container d-flex p-0">
     <img src="../static/assets/Home_Page_Image.jpg" alt="Pink shirt girl in front of laptop smiling">
-    <span class="d-flex flex-column content">
-        <h1 class="text-center align-items-center">WELCOME</h1>
-        <span class="d-flex justify-content-between">
+    <span class="d-flex flex-column content justify-content-center align-items-center">
+        <h1 class="">WELCOME</h1>
+        <span class="d-flex justify-content-around w-25">
             <a href="/teacher/login" class="btn btn-primary">Teacher Login</a>
             <a href="/student/login" class="btn btn-primary">Student Login</a>
         </span>
