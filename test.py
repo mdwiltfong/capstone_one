@@ -20,7 +20,7 @@ app.config['TESTING'] = True
 app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
 
 class OnBoarding(TestCase):
-    def test_signup(self):
+    def test_student_signup(self):
         with app.test_client() as client:
             resp=client.post("/get-started/auth",data={
                 "username":"tester91",
@@ -51,7 +51,18 @@ class OnBoarding(TestCase):
             self.assertEqual(resp.status_code, 200)
             s=Student.query.filter_by(username="tester91").first()
             
+    def test_teacher_signup(self):
+        with app.test_client() as client:
+            resp=client.post("/teacher/signup",data={
+                "username":"teachertest",
+                "email":"teachertest@teachers.com",
+                "password":"123456"
+            }, follow_redirects=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("/get-started/payment",request.path)
+            self.assertIsNotNone(session['curr_user'])
 
+    
 
 
         

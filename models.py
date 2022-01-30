@@ -53,6 +53,78 @@ class Teacher(db.Model):
 
     address=db.relationship("Address")
 
+    @classmethod
+    def signup(cls,username,email,password):
+        hashed_pwd=bcrypt.generate_password_hash(password).decode('UTF-8')
+        new_teacher=Teacher(
+            username=username,
+            email=email,
+            password=hashed_pwd          
+        )
+        db.session.add(new_teacher)
+        return new_teacher
+    
+    @classmethod
+    def authentication(cls,username,password):
+            teacher=Teacher.query.filter_by(username=username).first()
+            is_auth = bcrypt.check_password_hash(teacher.password, password)
+            print(is_auth)
+            if is_auth:
+                return teacher
+            return False
+    @classmethod
+    def stripe_signup(cls,teacher,form):
+        try:
+            customer=stripe.Customer.create(
+                name= teacher.address[0].name,
+                email=teacher.email,
+                metadata={
+                    "username": teacher.username,
+                    "db_id":teacher.id,
+                    "customer_type":"teacher"
+                },
+                address={
+                    "city":teacher.address[0].city,
+                    "country": 'US',
+                    "line1":teacher.address[0].address_1,
+                    "line2":teacher.address[0].address_2,
+                    "postal_code":teacher.address[0].postal_code,
+                    "state":teacher.address[0].state
+                }
+            )
+            teacher_address=teacher.address[0]
+            card=stripe.PaymentMethod.create(
+                    type="card",
+                    billing_details={
+                        "address":{
+                            "city":teacher_address.city,
+                            "country":"US",
+                            "line1":teacher_address.address_1,
+                            "line2":teacher_address.address_2,
+                            "postal_code":teacher_address.postal_code,
+                            "state":teacher_address.state
+                        }
+                    },
+                    card={
+                        "number": form.card_number.data,
+                        "exp_month":f"{form.expiration.data : %m}".strip(),
+                        "exp_year":f"{form.expiration.data : %y}".strip()
+                    }
+                ) or None
+            if card:
+                    payment_method=stripe.PaymentMethod.attach(
+                    card.id,
+                    customer=customer.stripe_id
+                )
+            return {
+                "customer":customer,
+                "card":card,
+                "payment_method":payment_method
+            }
+        except Exception as err:
+            print(err)
+        else:
+            print("Stripe Sign On done")
 
 class Student(db.Model):
     __tablename__='students'
@@ -107,7 +179,8 @@ class Student(db.Model):
                 email=student.email,
                 metadata={
                     "username": student.username,
-                    "db_id":student.id
+                    "db_id":student.id,
+                    "customer_type":"student"
                 },
                 address={
                     "city":student.address[0].city,

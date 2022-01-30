@@ -28,9 +28,12 @@ db.create_all()
 def homepage():
     return render_template('index.html',message='Hey')
 
+@app.route("/signup")
+def signup():
+    return render_template("signup.html",message="Hey")
 
-@app.route('/get-started/auth',methods=["GET","POST"])
-def add_customer():
+@app.route('/student/signup',methods=["GET","POST"])
+def add_student():
     form=AddCustomer()
     if form.validate_on_submit():
         try:
@@ -43,6 +46,7 @@ def add_customer():
             db.session.commit()
 
             session["curr_user"]=new_student.id
+            session["student"]=True
 
             return redirect('/get-started/payment')
         except IntegrityError as err:
@@ -52,7 +56,34 @@ def add_customer():
             flash('* EMAIL IN USE: {} *'.format(existing.email))
             return redirect('/get-started/auth')
 
-    return render_template('add_customer.html',form=form)
+    return render_template('add_student.html',form=form)
+
+@app.route('/teacher/signup',methods=["GET","POST"])
+def add_teacher():
+    form=AddCustomer()
+    if form.validate_on_submit():
+        try:
+            new_teacher=Teacher.signup(
+                username=form.username.data,
+                email=form.email.data,
+                password=form.password.data
+            )
+
+            db.session.commit()
+
+            session["curr_user"]=new_teacher.id
+            session["teacher"]=True
+
+            return redirect('/get-started/payment')
+        except IntegrityError as err:
+            print(err)
+            db.session.rollback()
+            existing = Student.query.filter_by(email=form.email.data).first()
+            flash('* EMAIL IN USE: {} *'.format(existing.email))
+            return redirect('/get-started/auth')
+
+    return render_template('add_teacher.html',form=form)
+
 
 @app.route('/get-started/payment',methods=["GET","POST"])
 def customer_billing():
@@ -93,7 +124,7 @@ def logout():
         return redirect("/")
 
 @app.route("/student/login", methods=["GET","POST"])
-def login():
+def student_login():
     form=StudentLogin()
     if form.validate_on_submit():
         password=form.password.data
@@ -107,5 +138,22 @@ def login():
             flash("Hmmm, password or username are incorrect","danger")
             return redirect("/login")
     
-    return render_template("login.html",form=form)
+    return render_template("student_login.html",form=form)
+
+@app.route("/teacher/login", methods=["GET","POST"])
+def teacher_login():
+    form=StudentLogin()
+    if form.validate_on_submit():
+        password=form.password.data
+        username=form.username.data
+        teacher=Teacher.authentication(username,password)
+        if teacher:
+            session["curr_user"]=teacher.id
+            flash("You've logged in!","success")
+            return redirect("/")
+        else:
+            flash("Hmmm, password or username are incorrect","danger")
+            return redirect("/login")
+    
+    return render_template("teacher_login.html",form=form)
 
