@@ -24,10 +24,6 @@ app.config['TESTING'] = True
 app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
 
 class OnBoarding(TestCase):
-    def setUp(self):
-        test_user=Student(email="test@test.com",username="test21312",password="test")
-        db.session.add(test_user)
-        db.session.commit()
 
     def tearDown(self):
          
