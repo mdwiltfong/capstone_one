@@ -1,3 +1,4 @@
+from itertools import product
 import os
 from dotenv import load_dotenv, find_dotenv
 
@@ -6,7 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db, Address
 from forms import AddCustomer,PaymentDetails,StudentLogin
-import pdb
+import stripe
 
 #PSQL_CONNECTION_STRING=os.getenv('PSQL_CONNECTION_STRING')
 
@@ -32,68 +33,12 @@ def homepage():
 def signup():
     return render_template("signup.html",message="Hey")
 
-@app.route('/student/signup',methods=["GET","POST"])
-def add_student():
-    form=AddCustomer()
-    if form.validate_on_submit():
-        try:
-            new_student=Student.signup(
-                username=form.username.data,
-                email=form.email.data,
-                password=form.password.data
-            )
-
-            db.session.commit()
-
-            session["curr_user"]=new_student.id
-            session["student"]=True
-
-            return redirect('/get-started/payment')
-        except IntegrityError as err:
-            print(err)
-            db.session.rollback()
-            existing = Student.query.filter_by(email=form.email.data).first()
-            flash('* EMAIL IN USE: {} *'.format(existing.email))
-            return redirect('/get-started/auth')
-
-    return render_template('add_student.html',form=form)
-
-@app.route('/teacher/signup',methods=["GET","POST"])
-def add_teacher():
-    form=AddCustomer()
-    if form.validate_on_submit():
-        try:
-            new_teacher=Teacher.signup(
-                username=form.username.data,
-                email=form.email.data,
-                password=form.password.data
-            )
-
-            db.session.commit()
-
-            session["curr_user"]=new_teacher.id
-            session["teacher"]=True
-
-            return redirect('/get-started/payment')
-        except IntegrityError as err:
-            print(err)
-            db.session.rollback()
-            existing = Teacher.query.filter_by(email=form.email.data).first()
-            flash('* EMAIL IN USE: {} *'.format(existing.email))
-            return redirect('/get-started/auth')
-
-    return render_template('add_teacher.html',form=form)
-
-
 @app.route('/get-started/payment',methods=["GET","POST"])
 def customer_billing():
     form=PaymentDetails()
-
-    ''' TODO: This route needs to differentiate between students and teachers.We store whether they are students or teachers in the session, we just need to implement that logic.
-
-     '''
-
+    
     print('Test')
+    ## TODO #18 This rooute doesn't need this much logic. Instead route `/teacher/login` and `student/login` need this 
     if session.get('student',None) or session.get('teacher',None):
         client=Student.query.get(session["curr_user"]) or Teacher.query.get(session["curr_user"])
         if client.stripe_id:
@@ -130,6 +75,9 @@ def logout():
         flash("See you next time!","success")
         return redirect("/")
 
+#####################################Student Routes
+
+
 @app.route("/student/login", methods=["GET","POST"])
 def student_login():
     form=StudentLogin()
@@ -146,6 +94,60 @@ def student_login():
             return redirect("/student/login")
     
     return render_template("student_login.html",form=form)
+
+@app.route('/student/signup',methods=["GET","POST"])
+def add_student():
+    form=AddCustomer()
+    if form.validate_on_submit():
+        try:
+            new_student=Student.signup(
+                username=form.username.data,
+                email=form.email.data,
+                password=form.password.data
+            )
+
+            db.session.commit()
+
+            session["curr_user"]=new_student.id
+            session["student"]=True
+
+            return redirect('/get-started/payment')
+        except IntegrityError as err:
+            print(err)
+            db.session.rollback()
+            existing = Student.query.filter_by(email=form.email.data).first()
+            flash('* EMAIL IN USE: {} *'.format(existing.email))
+            return redirect('/get-started/auth')
+
+    return render_template('add_student.html',form=form)
+
+###########################teacher routes
+
+@app.route('/teacher/signup',methods=["GET","POST"])
+def add_teacher():
+    form=AddCustomer()
+    if form.validate_on_submit():
+        try:
+            new_teacher=Teacher.signup(
+                username=form.username.data,
+                email=form.email.data,
+                password=form.password.data
+            )
+
+            db.session.commit()
+
+            session["curr_user"]=new_teacher.id
+            session["teacher"]=True
+
+            return redirect('/get-started/payment')
+        except IntegrityError as err:
+            print(err)
+            db.session.rollback()
+            existing = Teacher.query.filter_by(email=form.email.data).first()
+            flash('* EMAIL IN USE: {} *'.format(existing.email))
+            return redirect('/get-started/auth')
+
+    return render_template('add_teacher.html',form=form)
 
 @app.route("/teacher/login", methods=["GET","POST"])
 def teacher_login():
@@ -164,3 +166,13 @@ def teacher_login():
     
     return render_template("teacher_login.html",form=form)
 
+@app.route("/teacher/plan/prices",methods=["GET","POST"])
+def plan_prices():
+    if session.get("teacher",None) == None:
+        return redirect("/")
+    products=stripe.Product.list(limit=2)
+    prices=stripe.Product.list(limit=2)
+
+     ## TODO The api separates PRICES and PRODUCTS. Two API calls will have to be made here in order to render the data. This information needs to come from the API since it's needed to make subscriptions and invoices. 
+
+    return render_template('subscription_list.html',prices=prices.data,products=products.data)

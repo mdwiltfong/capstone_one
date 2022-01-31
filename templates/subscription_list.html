@@ -1,0 +1,19 @@
+{% extends 'base.html' %} {% block title %} Subscriptions {% endblock title %}
+{% block content %}
+<div class="container">
+  {% for product in products %}
+  <div class="card" style="width: 18rem">
+      <h5 class="card-title">{{product["name"]}}</h5>
+      <p class="card-text">
+        {% for price in prices %}
+            {% if product["id"] == price["product"] %}
+                {{price}}
+            {% endif %}
+        {% endfor %}
+      </p>
+      <a href="#" class="btn btn-primary">Go somewhere</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock content %}
