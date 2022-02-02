@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, flash, redirect, session, g,a
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db, Address
-from forms import AddCustomer,PaymentDetails,StudentLogin
+from forms import AddCustomer,PaymentDetails,StudentLogin, SubscriptionPlan
 import stripe
 
 #PSQL_CONNECTION_STRING=os.getenv('PSQL_CONNECTION_STRING')
@@ -168,9 +168,10 @@ def teacher_login():
 
 @app.route("/teacher/plan/prices",methods=["GET","POST"])
 def plan_prices():
+    form=SubscriptionPlan()
     products=stripe.Product.list(limit=2)
     prices=stripe.Price.list(limit=2)
 
      ## TODO The api separates PRICES and PRODUCTS. Two API calls will have to be made here in order to render the data. This information needs to come from the API since it's needed to make subscriptions and invoices. 
     print(prices)
-    return render_template('subscription_list.html',prices=prices.data,products=products.data)
+    return render_template('subscription_list.html',form=form,prices=prices.data,products=products.data)

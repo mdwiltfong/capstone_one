@@ -2,6 +2,9 @@ h5 {
   color: rgb(188, 188, 188);
   font-weight: bold;
 }
+h2 {
+  color: crimson;
+}
 
 .price {
   color: crimson;
