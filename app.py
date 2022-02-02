@@ -139,7 +139,7 @@ def add_teacher():
             session["curr_user"]=new_teacher.id
             session["teacher"]=True
 
-            return redirect('/get-started/payment')
+            return redirect('/teacher/plan/prices')
         except IntegrityError as err:
             print(err)
             db.session.rollback()
@@ -168,11 +168,9 @@ def teacher_login():
 
 @app.route("/teacher/plan/prices",methods=["GET","POST"])
 def plan_prices():
-    if session.get("teacher",None) == None:
-        return redirect("/")
     products=stripe.Product.list(limit=2)
-    prices=stripe.Product.list(limit=2)
+    prices=stripe.Price.list(limit=2)
 
      ## TODO The api separates PRICES and PRODUCTS. Two API calls will have to be made here in order to render the data. This information needs to come from the API since it's needed to make subscriptions and invoices. 
-
+    print(prices)
     return render_template('subscription_list.html',prices=prices.data,products=products.data)

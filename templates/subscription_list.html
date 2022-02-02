@@ -7,7 +7,7 @@
       <p class="card-text">
         {% for price in prices %}
             {% if product["id"] == price["product"] %}
-                {{price}}
+                {{"{p:.2f}".format(p=price["unit_amount"]/100)}}
             {% endif %}
         {% endfor %}
       </p>
