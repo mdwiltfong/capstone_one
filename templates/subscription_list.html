@@ -1,19 +1,37 @@
 {% extends 'base.html' %} {% block title %} Subscriptions {% endblock title %}
-{% block content %}
-<div class="container">
-  {% for product in products %}
-  <div class="card" style="width: 18rem">
+{% block stylesheet %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='subscription_list.css') }}"
+/>
+{% endblock stylesheet %} {% block content %}
+<div class="container d-flex flex-column align-items-center">
+  <div class="row"><h2>Subcribe to Our Plans</h2></div>
+  <div class="row flex-row">
+    {% for product in products %}
+    <div class="card mx-3 border border-danger" style="width: 18rem">
       <h5 class="card-title">{{product["name"]}}</h5>
       <p class="card-text">
-        {% for price in prices %}
-            {% if product["id"] == price["product"] %}
-                {{"{p:.2f}".format(p=price["unit_amount"]/100)}}
-            {% endif %}
+        {% for price in prices if price["product"] == product["id"] %}
+        <p class="price">
+          {{"{p:.2f}".format(p=price["unit_amount"]/100)}} 
+          <br/>
+        </p>
+        <p class="price_details">
+          Per {{price["recurring"]["interval"].capitalize()}}
+          <br/>
+          Billed Monthly
+
+        </p>
         {% endfor %}
       </p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
+      <div class="row w-100 flex-row justify-content-center">
+        <a href="#" class="btn btn-primary m-2">Select</a>
+      </div>
+      
     </div>
+    {% endfor %}
   </div>
-  {% endfor %}
 </div>
+
 {% endblock content %}
