@@ -1,0 +1,19 @@
+h5 {
+  color: rgb(188, 188, 188);
+  font-weight: bold;
+}
+
+.price {
+  color: crimson;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.price_details {
+  color: rgb(188, 188, 188);
+}
+.btn {
+  width: 100px;
+  background-color: crimson;
+  border-color: crimson;
+}
