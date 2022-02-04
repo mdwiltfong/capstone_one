@@ -37,7 +37,6 @@ def signup():
 def customer_billing():
     form=PaymentDetails()
     
-    print('Test')
     ## TODO #18 This rooute doesn't need this much logic. Instead route `/teacher/login` and `student/login` need this 
     if session.get('student',None) or session.get('teacher',None):
         client=Student.query.get(session["curr_user"]) or Teacher.query.get(session["curr_user"])
@@ -145,7 +144,7 @@ def add_teacher():
             db.session.rollback()
             existing = Teacher.query.filter_by(email=form.email.data).first()
             flash('* EMAIL IN USE: {} *'.format(existing.email))
-            return redirect('/get-started/auth')
+            return redirect('/teacher/signup')
 
     return render_template('add_teacher.html',form=form)
 

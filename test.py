@@ -63,32 +63,8 @@ class OnBoarding(TestCase):
                 "password":"123456"
             }, follow_redirects=True)
             self.assertEqual(resp.status_code, 200)
-            self.assertIn("/get-started/payment",request.path)
+            self.assertIn("/teacher/plan/prices",request.path)
             self.assertIsNotNone(session['curr_user'])   
-    @unittest.skip
-    def test_stripe_signup(self):
-        with app.test_client() as client:
-            with client.session_transaction() as sess:
-                sess['student']=True
-                sess['curr_user']=2
 
-            student=Student.query.get(sess['curr_user'])
-            ''' resp=client.post("/get-started/payment",data={
-                "city": "Test City",
-                "name": "Test Stripe Client",
-                "country":"US",
-                "address_1":"8 Bishops Mills Way",
-                "address_2": None,
-                "postal_code":"89052",
-                "state":"TX",
-                "card_number":"4242424242424242",
-                "expiration":"01/25"
-            }) '''
 
-            resp=client.get("/get-started/payment")
-            html=resp.get_data(as_text=True)
-
-        s=Student.query.get(2)
-        self.assertEqual(resp.status_code,200)
-        self.assertIn('Billing Address',html)
         
