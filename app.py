@@ -171,7 +171,8 @@ def plan_prices():
     form=SubscriptionPlan()
     products=stripe.Product.list(limit=2)
     prices=stripe.Price.list(limit=2)
-
+    if form.validate_on_submit():
+        print(form.data)
      ## TODO The api separates PRICES and PRODUCTS. Two API calls will have to be made here in order to render the data. This information needs to come from the API since it's needed to make subscriptions and invoices. 
-    print(prices)
+
     return render_template('subscription_list.html',form=form,prices=prices.data,products=products.data)

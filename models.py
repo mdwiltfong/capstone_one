@@ -74,7 +74,7 @@ class Teacher(db.Model):
             teacher=Teacher.query.filter_by(username=username).first()
             if teacher:
                 is_auth = bcrypt.check_password_hash(teacher.password, password)
-                print(is_auth)
+                
                 if is_auth:
                     return teacher
             return False
@@ -221,8 +221,7 @@ class Student(db.Model):
                     card.id,
                     customer=customer.stripe_id
                 )
-            print("stripe_signup")
-            print(customer,card,payment_method)
+            
             return {
                 "customer":customer,
                 "card":card,
