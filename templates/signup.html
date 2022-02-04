@@ -1,21 +1,26 @@
-{% extends 'base.html' %}
-{% block stylesheet %}
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-{% endblock stylesheet %}
-{% block title %}
-    Signup
-{% endblock title %}
-
-{% block content %}
-<div class="container">
-    <img class="inline-block" src="../static/assets/tutor-student.jpeg" alt="">
-    <span class="d-flex flex-column content">
-        <h1 class="text-center align-items-center">Welcome!</h1>
-        <span class="d-flex justify-content-between">
-            <a href="/teacher/signup" class="btn btn-primary">Teacher Signup</a>
-            <a href="/student/signup" class="btn btn-primary">Student Signup</a>
-        </span>
+{% extends 'base.html' %} {% block stylesheet %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+{% endblock stylesheet %} {% block title %} Homepage {% endblock title %} {%
+block content %} {% for category, msg in
+get_flashed_messages(with_categories=true) %}
+<!--TODO #13 @AndreaDubuc Look at possibly having these messages slide on and off the screen through animations-->
+<div class="container d-flex justify-content-center">
+  <p class="w-25 alert alert-{{category}}">{{msg}}</p>
+</div>
+{% endfor %}
+<div class="container d-flex p-0">
+  <img
+    src="../static/assets/Home_Page_Image.jpg"
+    alt="Pink shirt girl in front of laptop smiling"
+  />
+  <span
+    class="d-flex flex-column content justify-content-center align-items-center"
+  >
+    <h1 class="">WELCOME</h1>
+    <span class="d-flex justify-content-around w-25">
+      <a href="/teacher/signup" class="btn btn-primary">Teacher Signup</a>
+      <a href="/student/signup" class="btn btn-primary">Student Signup</a>
     </span>
+  </span>
 </div>
 {% endblock content %}

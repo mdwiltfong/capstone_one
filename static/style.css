@@ -1,38 +1,30 @@
 .container {
-    width: 1500px;
-    height: auto;
-    display: block;
-    position: relative;
-    overflow: hidden
+  width: 1500px;
+  height: auto;
+  display: block;
+  position: relative;
+  overflow: hidden;
 }
 
 .container img {
-    display: inline-block;
-    width: 100%;
-    height: auto;
-    
-
+  display: inline-block;
+  width: 100%;
+  height: auto;
 }
 
-.content{
-    position: absolute;
-    width: 100%;
-    height:100%;
-
-
+.content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 .content h1 {
-    z-index: 100;
-    font-size: 60px;
-    color: #ffff;
-    font-family: 'Josefin Sans', sans-serif;
+  z-index: 100;
+  font-size: 60px;
+  color: #ffff;
+  font-family: "Josefin Sans", sans-serif;
 }
 
-
-
 .btn-primary {
-    color: #fff;
-    background-color: #84878a;
-    border-color: #84878a;   
-
-} 
+  background-color: #84878a;
+  border-color: #84878a;
+}
