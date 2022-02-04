@@ -1,0 +1,34 @@
+{% extends 'base.html' %} {% block title %} Subscriptions {% endblock title %}
+{% block stylesheet %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='subscription_list.css') }}"
+/>
+{% endblock stylesheet %} {% block content %}
+<div class="container">
+  <h1 class="display-1 text-center">Billing Address</h1>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      {% for msg in get_flashed_messages() %}
+      <p class="bg-danger">{{msg}}</p>
+      {% endfor %}
+      <form action="" method="post">
+        {{form.hidden_tag()}} {% for field in form if field.widget.input_type
+        !='hidden' %}
+        <div class="form-group">
+          {% if field.type == "RadioField" %} {{field.label }} {% for subfield
+          in field %} {{subfield}} {{subfield.label}} {% endfor %} {%else%}
+          {{field.label}} {{field}} {% endif %} {% for err in field.errors %}
+          <small class="form-text text-danger"> {{err}} </small>
+          {% endfor %}
+        </div>
+
+        {% endfor %}
+        <button class="btn btn-success btn-lg">Next</button>
+        <button class="btn btn-danger btn-lg">Go Back</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
