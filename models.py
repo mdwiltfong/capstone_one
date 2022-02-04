@@ -1,4 +1,5 @@
 from datetime import datetime
+from sre_constants import SUCCESS
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 import stripe
@@ -131,7 +132,12 @@ class Teacher(db.Model):
             print(err)
         else:
             print("Stripe Sign On done")
-
+    @classmethod
+    def create_session():
+       session=stripe.checkout.Session.create(
+           success_url="http://127.0.0.1:5000/order/success",
+           cancel_url="http://127.0.0.1:5000/order/cancel"
+       )
 class Student(db.Model):
     __tablename__='students'
 
