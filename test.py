@@ -1,4 +1,6 @@
 from http import client
+import json
+import pdb
 from unittest import TestCase
 import unittest
 from flask import request,session
@@ -60,5 +62,19 @@ class OnBoarding(TestCase):
             self.assertIn("/teacher/plan/prices",request.path)
             self.assertEqual(session['curr_user'],teacher.stripe_id)   
 
+
+
+class StripeOnboarding(TestCase):
+    def test_teacher_subscription(self):
+        with app.test_client() as client:
+            with client.session_transaction() as sess:
+                sess["curr_user"]="cus_L3wLu3QG3OtZuJ"
+
+            resp=client.post("/teacher/plan/prices",data={
+                'plan': "prod_L3c8LwHYwslzi1"
+            })
+
+            print(resp.json)
+            
 
         

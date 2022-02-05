@@ -1,15 +1,14 @@
-from itertools import product
+
 import os
 import pdb
-from random import seed
 from dotenv import load_dotenv, find_dotenv
-
-from flask import Flask, render_template, request, flash, redirect, session, g,abort
+from flask import Flask, render_template, flash, redirect, session, g,abort,jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db, Address
 from forms import AddCustomer,PaymentDetails,StudentLogin, SubscriptionPlan
 import stripe
+import json
 
 #PSQL_CONNECTION_STRING=os.getenv('PSQL_CONNECTION_STRING')
 
@@ -140,7 +139,7 @@ def add_teacher():
 
             session["curr_user"]=new_teacher.stripe_id
             session["teacher"]=True
-            
+
             return redirect('/teacher/plan/prices')
         except IntegrityError as err:
             print(err)
@@ -161,22 +160,20 @@ def create_checkout_session():
 
         for price in prices.data:
             if price["product"] == form.plan.data:
-                plan_price_id=price["ID"]
+                plan_price_id=price["id"]
 
-        checkout_session = stripe.checkout.Session.create(
-            line_items=[
-                {
-                    'price':plan_price_id,
-                    'quantity': 1,
-                },
-            ],
-            customer=session["curr_user"],
-            mode='subscription',
-            success_url=DOMAIN +
-            '/teacher/plan/prices/success',
-            cancel_url=DOMAIN + '/teacher/plan/prices/cancel',
-        )
-     ## TODO The api separates PRICES and PRODUCTS. Two API calls will have to be made here in order to render the data. This information needs to come from the API since it's needed to make subscriptions and invoices. 
+        try:
+            subscription=stripe.Subscription.create(
+                customer=session["curr_user"],
+                items=[{
+                    'price': plan_price_id
+                }],
+                payment_behavior='default_incomplete',
+                expand=['latest_invoice.payment_intent']
+            )
+            return jsonify(subscriptionId=subscription.id, clientSecret=subscription.latest_invoice.payment_intent.client_secret)
+        except Exception as e:
+            return jsonify(error={'message': e.user_message}), 400
 
     return render_template('subscription_list.html',form=form,prices=prices.data,products=products.data)
 
