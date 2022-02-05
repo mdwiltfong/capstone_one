@@ -27,7 +27,7 @@ class StudentLogin(FlaskForm):
     password=PasswordField("Password",validators=[InputRequired("Password is Required"), Length(min=6,message="Password need to be 6 characters in length")])
 
 class SubscriptionPlan(FlaskForm):
-    plan = RadioField("Subscription Options",choices=[('basic','Basic Plan'),('premium',"Premium Plan")])
+    plan = RadioField("Subscription Options",choices=[('prod_L3c8LwHYwslzi1','Basic Plan'),('prod_L3c9H4LwWopivI',"Premium Plan")])
     name=StringField("Name (as it appears on your card)",validators=[InputRequired()])
     card_number=StringField("Card Number (no dashes or spaces)",validators=[InputRequired()])
     expiration=DateField("MM / YY",format="%m/%y",validators=[InputRequired()])

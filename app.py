@@ -1,5 +1,6 @@
 from itertools import product
 import os
+import pdb
 from dotenv import load_dotenv, find_dotenv
 
 from flask import Flask, render_template, request, flash, redirect, session, g,abort
@@ -166,12 +167,27 @@ def teacher_login():
     return render_template("teacher_login.html",form=form)
 
 @app.route("/teacher/plan/prices",methods=["GET","POST"])
-def plan_prices():
+def create_checkout_session():
     form=SubscriptionPlan()
     products=stripe.Product.list(limit=2)
     prices=stripe.Price.list(limit=2)
     if form.validate_on_submit():
-        print(form.data)
+
+        for price in prices.data:
+            if price["product"] == form.plan.data:
+                plan_price=price
+        ''' checkout_session = stripe.checkout.Session.create(
+            line_items=[
+                {
+                    'price':plan_price["id"]  ,
+                    'quantity': 1,
+                },
+            ],
+            mode='subscription',
+            success_url="http://127.0.0.1:5000" +
+            '/success?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url=YOUR_DOMAIN + '/cancel.html',
+        ) '''
      ## TODO The api separates PRICES and PRODUCTS. Two API calls will have to be made here in order to render the data. This information needs to come from the API since it's needed to make subscriptions and invoices. 
 
     return render_template('subscription_list.html',form=form,prices=prices.data,products=products.data)
