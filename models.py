@@ -67,6 +67,15 @@ class Teacher(db.Model):
             email=email,
             password=hashed_pwd          
         )
+        customer=stripe.Customer.create(
+                email=new_teacher.email,
+                metadata={
+                    "username": new_teacher.username,
+                    "db_id":new_teacher.id,
+                    "customer_type":"teacher"
+                }
+            )
+        new_teacher.stripe_id=customer.id
         db.session.add(new_teacher)
         return new_teacher
     
@@ -79,59 +88,6 @@ class Teacher(db.Model):
                 if is_auth:
                     return teacher
             return False
-    @classmethod
-    def stripe_signup(cls,teacher,form):
-        try:
-            customer=stripe.Customer.create(
-                name= teacher.address[0].name,
-                email=teacher.email,
-                metadata={
-                    "username": teacher.username,
-                    "db_id":teacher.id,
-                    "customer_type":"teacher"
-                },
-                address={
-                    "city":teacher.address[0].city,
-                    "country": 'US',
-                    "line1":teacher.address[0].address_1,
-                    "line2":teacher.address[0].address_2,
-                    "postal_code":teacher.address[0].postal_code,
-                    "state":teacher.address[0].state
-                }
-            )
-            teacher_address=teacher.address[0]
-            card=stripe.PaymentMethod.create(
-                    type="card",
-                    billing_details={
-                        "address":{
-                            "city":teacher_address.city,
-                            "country":"US",
-                            "line1":teacher_address.address_1,
-                            "line2":teacher_address.address_2,
-                            "postal_code":teacher_address.postal_code,
-                            "state":teacher_address.state
-                        }
-                    },
-                    card={
-                        "number": form.card_number.data,
-                        "exp_month":f"{form.expiration.data : %m}".strip(),
-                        "exp_year":f"{form.expiration.data : %y}".strip()
-                    }
-                ) or None
-            if card:
-                    payment_method=stripe.PaymentMethod.attach(
-                    card.id,
-                    customer=customer.stripe_id
-                )
-            return {
-                "customer":customer,
-                "card":card,
-                "payment_method":payment_method
-            }
-        except Exception as err:
-            print(err)
-        else:
-            print("Stripe Sign On done")
 
 class Student(db.Model):
     __tablename__='students'

@@ -1,5 +1,4 @@
 from http import client
-from unicodedata import name
 from unittest import TestCase
 import unittest
 from flask import request,session
@@ -26,17 +25,11 @@ app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
 class OnBoarding(TestCase):
 
     def tearDown(self):
-         
-        
         user= Student.query.filter_by(username="tester91").first() if Student.query.filter_by(username="tester91").first() else Teacher.query.filter_by(username="teachertest").first()
-       
-    
         if user.username == "tester91":
-           
             db.session.query(Student).filter(Student.username=="tester91").delete()
             db.session.commit()
         else:
-    
             db.session.query(Teacher).filter(Teacher.username=="teachertest").delete()
             db.session.commit()
 
@@ -62,9 +55,10 @@ class OnBoarding(TestCase):
                 "email":"teachertest@teachers.com",
                 "password":"123456"
             }, follow_redirects=True)
+            teacher=Teacher.query.filter_by(username="teachertest").first()
             self.assertEqual(resp.status_code, 200)
             self.assertIn("/teacher/plan/prices",request.path)
-            self.assertIsNotNone(session['curr_user'])   
+            self.assertEqual(session['curr_user'],teacher.stripe_id)   
 
 
         

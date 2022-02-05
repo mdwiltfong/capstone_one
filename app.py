@@ -1,6 +1,7 @@
 from itertools import product
 import os
 import pdb
+from random import seed
 from dotenv import load_dotenv, find_dotenv
 
 from flask import Flask, render_template, request, flash, redirect, session, g,abort
@@ -12,6 +13,7 @@ import stripe
 
 #PSQL_CONNECTION_STRING=os.getenv('PSQL_CONNECTION_STRING')
 
+DOMAIN="http://127.0.0.1:5000"
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = (
@@ -136,9 +138,9 @@ def add_teacher():
 
             db.session.commit()
 
-            session["curr_user"]=new_teacher.id
+            session["curr_user"]=new_teacher.stripe_id
             session["teacher"]=True
-
+            
             return redirect('/teacher/plan/prices')
         except IntegrityError as err:
             print(err)
@@ -149,6 +151,41 @@ def add_teacher():
 
     return render_template('add_teacher.html',form=form)
 
+
+@app.route("/teacher/plan/prices",methods=["GET","POST"])
+def create_checkout_session():
+    form=SubscriptionPlan()
+    products=stripe.Product.list(limit=2)
+    prices=stripe.Price.list(limit=2)
+    if form.validate_on_submit():
+
+        for price in prices.data:
+            if price["product"] == form.plan.data:
+                plan_price_id=price["ID"]
+
+        checkout_session = stripe.checkout.Session.create(
+            line_items=[
+                {
+                    'price':plan_price_id,
+                    'quantity': 1,
+                },
+            ],
+            customer=session["curr_user"],
+            mode='subscription',
+            success_url=DOMAIN +
+            '/teacher/plan/prices/success',
+            cancel_url=DOMAIN + '/teacher/plan/prices/cancel',
+        )
+     ## TODO The api separates PRICES and PRODUCTS. Two API calls will have to be made here in order to render the data. This information needs to come from the API since it's needed to make subscriptions and invoices. 
+
+    return render_template('subscription_list.html',form=form,prices=prices.data,products=products.data)
+
+@app.route("/teacher/plan/prices/success",methods=["GET","POST"])
+def success_page():
+    return ("payment_success.html")
+@app.route("/teacher/plan/prices/cancel",methods=["GET","POST"])
+def cancel_page():
+    return ("payment_cancel.html")
 @app.route("/teacher/login", methods=["GET","POST"])
 def teacher_login():
     form=StudentLogin()
@@ -165,29 +202,3 @@ def teacher_login():
             return redirect("/teacher/login")
     
     return render_template("teacher_login.html",form=form)
-
-@app.route("/teacher/plan/prices",methods=["GET","POST"])
-def create_checkout_session():
-    form=SubscriptionPlan()
-    products=stripe.Product.list(limit=2)
-    prices=stripe.Price.list(limit=2)
-    if form.validate_on_submit():
-
-        for price in prices.data:
-            if price["product"] == form.plan.data:
-                plan_price=price
-        ''' checkout_session = stripe.checkout.Session.create(
-            line_items=[
-                {
-                    'price':plan_price["id"]  ,
-                    'quantity': 1,
-                },
-            ],
-            mode='subscription',
-            success_url="http://127.0.0.1:5000" +
-            '/success?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url=YOUR_DOMAIN + '/cancel.html',
-        ) '''
-     ## TODO The api separates PRICES and PRODUCTS. Two API calls will have to be made here in order to render the data. This information needs to come from the API since it's needed to make subscriptions and invoices. 
-
-    return render_template('subscription_list.html',form=form,prices=prices.data,products=products.data)
