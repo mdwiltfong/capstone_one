@@ -171,10 +171,10 @@ def create_checkout_session():
                 payment_behavior='default_incomplete',
                 expand=['latest_invoice.payment_intent']
             )
-            return jsonify(subscriptionId=subscription.id, clientSecret=subscription.latest_invoice.payment_intent.client_secret)
+            session["subscriptionId"]=subscription.id
+            session["clientSecret"]=subscription.latest_invoice.payment_intent.client_secret
         except Exception as e:
             return jsonify(error={'message': e.user_message}), 400
-
     return render_template('subscription_list.html',form=form,prices=prices.data,products=products.data)
 
 @app.route("/teacher/plan/prices/success",methods=["GET","POST"])
