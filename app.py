@@ -1,4 +1,5 @@
 
+from crypt import methods
 import os
 import pdb
 from dotenv import load_dotenv, find_dotenv
@@ -156,27 +157,20 @@ def create_checkout_session():
     form=SubscriptionPlan()
     products=stripe.Product.list(limit=2)
     prices=stripe.Price.list(limit=2)
-    if form.validate_on_submit():
-
-        for price in prices.data:
+    for price in prices.data:
             if price["product"] == form.plan.data:
-                plan_price_id=price["id"]
+                plan_price=price
 
-        try:
-            subscription=stripe.Subscription.create(
-                customer=session["curr_user"],
-                items=[{
-                    'price': plan_price_id
-                }],
-                payment_behavior='default_incomplete',
-                expand=['latest_invoice.payment_intent']
-            )
-            session["subscriptionId"]=subscription.id
-            session["clientSecret"]=subscription.latest_invoice.payment_intent.client_secret
-        except Exception as e:
-            return jsonify(error={'message': e.user_message}), 400
+    if form.validate_on_submit():
+        subscription=Teacher.create_subscription(session["curr_user"],form,plan_price)
+        intent=Teacher.create_paymentintent(plan_price,session["curr_user"])
+        session["client_secret"]=intent["client_secret"]
+        return redirect("/checkout")
     return render_template('subscription_list.html',form=form,prices=prices.data,products=products.data)
 
+@app.route("/checkout",methods=["GET","POST"])
+def checkout():
+    return render_template('checkout.html')
 @app.route("/teacher/plan/prices/success",methods=["GET","POST"])
 def success_page():
     return ("payment_success.html")

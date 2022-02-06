@@ -13,17 +13,17 @@ let stripe = Stripe(
 );
 
 const subscriptionId = window.sessionStorage.getItem("subscriptionId");
-const client_string = window.sessionStorage.getItem("clientSecret");
+const client_secret = window.sessionStorage.getItem("clientSecret");
 
 const appearance = {
   theme: "flat",
 };
 
-const elements = stripe.elements({ client_string, appearance });
+const elements = stripe.elements({ client_secret, appearance });
 
 let cardElement = elements.create("card");
 
-cardElement.mount("#card-input");
+cardElement.mount("#payment-element");
 
 // Extract the client secret query string argument. This is
 // required to confirm the payment intent from the front-end.
@@ -41,14 +41,14 @@ cardElement.mount("#card-input");
 //   the payment information and try again
 // - Stripe Elements automatically handles next actions like 3DSecure that are required for SCA
 // - Complete the subscription flow when the payment succeeds
-const form = document.querySelector("#subscribe-form");
+const form = document.querySelector("#payment-form");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const nameInput = document.getElementById("name");
 
   // Create payment method and confirm payment intent.
   stripe
-    .confirmCardPayment(clientSecret, {
+    .confirmCardPayment(client_secret, {
       payment_method: {
         card: cardElement,
         billing_details: {

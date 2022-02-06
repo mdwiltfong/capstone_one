@@ -28,11 +28,3 @@ class StudentLogin(FlaskForm):
 
 class SubscriptionPlan(FlaskForm):
     plan = RadioField("Subscription Options",choices=[('prod_L3c8LwHYwslzi1','Basic Plan'),('prod_L3c9H4LwWopivI',"Premium Plan")])
-    name=StringField("Name (as it appears on your card)",validators=[InputRequired()])
-    expiration=DateField("MM / YY",format="%m/%y",validators=[InputRequired()])
-    city=StringField("City",validators=[InputRequired()])
-    state=SelectField("State",choices=dict_to_list(US_STATES),validators=[InputRequired()])
-    country=StringField("Country",validators=[InputRequired()])
-    address_1=StringField("Address Line 1",validators=[InputRequired()])
-    address_2=StringField("Address Line 2",validators=[Optional()])
-    postal_code=StringField("Postal Code",validators=[InputRequired()])
