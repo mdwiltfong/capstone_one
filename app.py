@@ -4,7 +4,7 @@ from crypt import methods
 import os
 import pdb
 from dotenv import load_dotenv, find_dotenv
-from flask import Flask, render_template, flash, redirect, session, jsonify
+from flask import Flask, render_template, flash, redirect, session, jsonify,request
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db, Address
@@ -13,6 +13,7 @@ import stripe
 import json
 
 #PSQL_CONNECTION_STRING=os.getenv('PSQL_CONNECTION_STRING')
+
 
 DOMAIN="http://127.0.0.1:5000"
 
@@ -61,7 +62,6 @@ def customer_billing():
                 address_2= form.address_2.data or None
             )
             client.address.append(new_address)
-            print(client,form)
             new_stripe_customer=Student.stripe_signup(client,form)
             client.stripe_id=new_stripe_customer["customer"].id
             db.session.add(client)
@@ -171,6 +171,8 @@ def create_checkout_session():
 @app.route("/create-payment-intent",methods=["GET","POST"])
 def create_payment_intent():
     return jsonify(client_secret=session["client_secret"])
+
+
 @app.route("/checkout",methods=["GET","POST"])
 def checkout():
     return render_template('checkout.html')
@@ -180,6 +182,8 @@ def success_page():
 @app.route("/teacher/plan/prices/cancel",methods=["GET","POST"])
 def cancel_page():
     return ("payment_cancel.html")
+
+
 @app.route("/teacher/login", methods=["GET","POST"])
 def teacher_login():
     form=StudentLogin()
@@ -196,3 +200,46 @@ def teacher_login():
             return redirect("/teacher/login")
     
     return render_template("teacher_login.html",form=form)
+
+
+@app.route("/webhook",methods=["POST"])
+def webhook_received():
+    WEBHOOK_SECRET=os.getenv('WEBHOOK_SECRET')
+    incoming_data=json.loads(request.data)
+    if WEBHOOK_SECRET:
+        # Retrieve the event by verifying the signature using the raw body and secret if webhook signing is configured.
+        signature = request.headers.get('stripe-signature')
+        try:
+            event = stripe.Webhook.construct_event(
+                payload=request.data, sig_header=signature, secret=WEBHOOK_SECRET)
+            data = event['data']
+        except Exception as e:
+            return e
+        # Get the type of webhook event sent - used to check the status of PaymentIntents.
+        event_type = event['type']
+    else:
+        data = incoming_data['data']
+        event_type = incoming_data['type']
+
+    data_object = data['object']
+
+    if event_type == 'invoice.paid':
+        # Used to provision services after the trial has ended.
+        # The status of the invoice will show up as paid. Store the status in your
+        # database to reference when a user accesses your service to avoid hitting rate
+        # limits.
+        print(data)
+
+    if event_type == 'invoice.payment_failed':
+        # If the payment fails or the customer does not have a valid payment method,
+        # an invoice.payment_failed event is sent, the subscription becomes past_due.
+        # Use this webhook to notify your user that their payment has
+        # failed and to retrieve new card details.
+        print(data)
+
+    if event_type == 'customer.subscription.deleted':
+        # handle subscription cancelled automatically based
+        # upon your subscription settings. Or if the user cancels it.
+        print(data)
+
+    return jsonify({'status': 'success'})
