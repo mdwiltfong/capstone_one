@@ -1,9 +1,10 @@
 
+from code import interact
 from crypt import methods
 import os
 import pdb
 from dotenv import load_dotenv, find_dotenv
-from flask import Flask, render_template, flash, redirect, session, g,abort,jsonify
+from flask import Flask, render_template, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db, Address
@@ -162,12 +163,14 @@ def create_checkout_session():
                 plan_price=price
 
     if form.validate_on_submit():
-        subscription=Teacher.create_subscription(session["curr_user"],form,plan_price)
-        intent=Teacher.create_paymentintent(plan_price,session["curr_user"])
-        session["client_secret"]=intent["client_secret"]
+        subscription=Teacher.create_subscription(session["curr_user"],plan_price)
+        session["client_secret"]=subscription["clientSecret"]
         return redirect("/checkout")
     return render_template('subscription_list.html',form=form,prices=prices.data,products=products.data)
 
+@app.route("/create-payment-intent",methods=["GET","POST"])
+def create_payment_intent():
+    return jsonify(client_secret=session["client_secret"])
 @app.route("/checkout",methods=["GET","POST"])
 def checkout():
     return render_template('checkout.html')

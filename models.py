@@ -81,7 +81,7 @@ class Teacher(db.Model):
         db.session.add(new_teacher)
         return new_teacher
     @classmethod
-    def create_subscription(cls,customer_id,form,price):      
+    def create_subscription(cls,customer_id,price):      
         try:
             subscription=stripe.Subscription.create(
                 customer=customer_id,
@@ -91,18 +91,23 @@ class Teacher(db.Model):
                 payment_behavior='default_incomplete',
                 expand=['latest_invoice.payment_intent']
             )
-            return jsonify(subscriptionId=subscription.id)
+            return {
+                "subscriptionId":subscription.id,
+                "clientSecret":subscription.latest_invoice.payment_intent.client_secret
+                }
         except Exception as e:
             return jsonify(error={'message': e.user_message}), 400
     @classmethod
     def create_paymentintent(cls,price,customer_stripe_id):
         intent=stripe.PaymentIntent.create(
-            amount=price["unit_amount"]/100,
-            currency="USA",
+            amount=price["unit_amount"],
+            currency="usd",
             automatic_payment_methods={"enabled":True},
             customer=customer_stripe_id
         )
-        return jsonify(client_secret=intent["client_secret"])
+        return {
+            "client_secret":intent["client_secret"]
+            }
     @classmethod
     def authentication(cls,username,password):
             teacher=Teacher.query.filter_by(username=username).first()

@@ -82,7 +82,7 @@ class TeacherStripeOnboarding(TestCase):
         teacher=Teacher.query.filter_by(username="stripe_testuser").first()
         self.assertIsNotNone(teacher.stripe_id)
     
-    @unittest.skip
+    
     def test_teacher_subscription(self):
         with app.test_client() as client:
             with client.session_transaction() as sess:
