@@ -17,7 +17,6 @@
       crossorigin="anonymous"
     />
 
-    {% block stylesheet %} {% endblock stylesheet %}
     <!--Google Fonts-->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,7 +24,8 @@
       href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@500&family=Roboto:wght@400;700&display=swap"
       rel="stylesheet"
     />
-    <script defer src="https://js.stripe.com/v3/"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    {% block stylesheet %} {% endblock stylesheet %}
     <title>{% block title %} {% endblock title %}</title>
   </head>
 
@@ -63,4 +63,5 @@
       crossorigin="anonymous"
     ></script>
   </body>
+  {% block script %} {% endblock script %}
 </html>

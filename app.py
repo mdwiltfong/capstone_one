@@ -1,16 +1,20 @@
-from itertools import product
-import os
-from dotenv import load_dotenv, find_dotenv
 
-from flask import Flask, render_template, request, flash, redirect, session, g,abort
+from code import interact
+from crypt import methods
+import os
+import pdb
+from dotenv import load_dotenv, find_dotenv
+from flask import Flask, render_template, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db, Address
 from forms import AddCustomer,PaymentDetails,StudentLogin, SubscriptionPlan
 import stripe
+import json
 
 #PSQL_CONNECTION_STRING=os.getenv('PSQL_CONNECTION_STRING')
 
+DOMAIN="http://127.0.0.1:5000"
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = (
@@ -135,7 +139,7 @@ def add_teacher():
 
             db.session.commit()
 
-            session["curr_user"]=new_teacher.id
+            session["curr_user"]=new_teacher.stripe_id
             session["teacher"]=True
 
             return redirect('/teacher/plan/prices')
@@ -148,6 +152,34 @@ def add_teacher():
 
     return render_template('add_teacher.html',form=form)
 
+
+@app.route("/teacher/plan/prices",methods=["GET","POST"])
+def create_checkout_session():
+    form=SubscriptionPlan()
+    products=stripe.Product.list(limit=2)
+    prices=stripe.Price.list(limit=2)
+    for price in prices.data:
+            if price["product"] == form.plan.data:
+                plan_price=price
+
+    if form.validate_on_submit():
+        subscription=Teacher.create_subscription(session["curr_user"],plan_price)
+        session["client_secret"]=subscription["clientSecret"]
+        return redirect("/checkout")
+    return render_template('subscription_list.html',form=form,prices=prices.data,products=products.data)
+
+@app.route("/create-payment-intent",methods=["GET","POST"])
+def create_payment_intent():
+    return jsonify(client_secret=session["client_secret"])
+@app.route("/checkout",methods=["GET","POST"])
+def checkout():
+    return render_template('checkout.html')
+@app.route("/teacher/plan/prices/success",methods=["GET","POST"])
+def success_page():
+    return ("payment_success.html")
+@app.route("/teacher/plan/prices/cancel",methods=["GET","POST"])
+def cancel_page():
+    return ("payment_cancel.html")
 @app.route("/teacher/login", methods=["GET","POST"])
 def teacher_login():
     form=StudentLogin()
@@ -164,14 +196,3 @@ def teacher_login():
             return redirect("/teacher/login")
     
     return render_template("teacher_login.html",form=form)
-
-@app.route("/teacher/plan/prices",methods=["GET","POST"])
-def plan_prices():
-    form=SubscriptionPlan()
-    products=stripe.Product.list(limit=2)
-    prices=stripe.Price.list(limit=2)
-    if form.validate_on_submit():
-        print(form.data)
-     ## TODO The api separates PRICES and PRODUCTS. Two API calls will have to be made here in order to render the data. This information needs to come from the API since it's needed to make subscriptions and invoices. 
-
-    return render_template('subscription_list.html',form=form,prices=prices.data,products=products.data)
