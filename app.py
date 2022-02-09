@@ -223,23 +223,17 @@ def webhook_received():
 
     data_object = data['object']
 
-    if event_type == 'invoice.paid':
-        # Used to provision services after the trial has ended.
-        # The status of the invoice will show up as paid. Store the status in your
-        # database to reference when a user accesses your service to avoid hitting rate
-        # limits.
-        print(data)
+    if event_type == 'invoice.payment_succeeded':
+        if data_object['billing_reason'] == 'subscription_create':
+            subscription_id = data_object['subscription']
+        payment_intent_id = data_object['payment_intent']
 
-    if event_type == 'invoice.payment_failed':
-        # If the payment fails or the customer does not have a valid payment method,
-        # an invoice.payment_failed event is sent, the subscription becomes past_due.
-        # Use this webhook to notify your user that their payment has
-        # failed and to retrieve new card details.
-        print(data)
+        # Retrieve the payment intent used to pay the subscription
+        payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
 
-    if event_type == 'customer.subscription.deleted':
-        # handle subscription cancelled automatically based
-        # upon your subscription settings. Or if the user cancels it.
-        print(data)
-
+        # Set the default payment method
+        stripe.Subscription.modify(
+          subscription_id,
+          default_payment_method=payment_intent.payment_method
+        )   
     return jsonify({'status': 'success'})
