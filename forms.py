@@ -27,4 +27,4 @@ class StudentLogin(FlaskForm):
     password=PasswordField("Password",validators=[InputRequired("Password is Required"), Length(min=6,message="Password need to be 6 characters in length")])
 
 class SubscriptionPlan(FlaskForm):
-    plan = RadioField("Subscription Options",choices=[('prod_L3c8LwHYwslzi1','Basic Plan'),('prod_L3c9H4LwWopivI',"Premium Plan")])
+    plan = RadioField("Subscription Options",choices=[('price_1KNUuRDBo40mpW7dT4BG7Kzl','Basic Plan'),('price_1KNUv7DBo40mpW7dDF2Vuq81',"Premium Plan")])

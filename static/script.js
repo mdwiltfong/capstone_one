@@ -28,7 +28,6 @@ const setMessage = (message) => {
   messageDiv.innerHTML += "<br>" + message;
 };
 
-// TODO We need to handle the client_secret from the backend to the front end better. Flask-Session does not set the client-session.
 const form = document.querySelector("#payment-form");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -64,22 +63,8 @@ form.addEventListener("submit", async (e) => {
       } else {
         // Redirect the customer to their account page
         console.log("--->", result);
-        /* 
-
-        $.ajax({
-          type: "POST",
-          dataType: "application/json",
-          url: "/payment",
-          data: JSON.stringify({
-            result,
-          }),
-          success: function (data) {
-            alert(data);
-          },
-        });
- */
         setMessage("Success! Redirecting to your account.");
-        //window.location.href = "/account.html";
+        window.location.href = "/teacher/plan/prices/success";
       }
     });
 });
