@@ -175,14 +175,9 @@ def checkout():
     return render_template('checkout.html')
 @app.route("/teacher/plan/prices/success",methods=["GET"])
 def success_page():
-    return render_template("success.html")
+    flash("Payment Succeeded!","success")
+    return redirect("/")
 
-
-def success_page():
-    return ("payment_success.html")
-@app.route("/teacher/plan/prices/cancel",methods=["GET","POST"])
-def cancel_page():
-    return ("payment_cancel.html")
 
 
 @app.route("/teacher/login", methods=["GET","POST"])
