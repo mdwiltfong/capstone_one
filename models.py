@@ -96,7 +96,7 @@ class Teacher(db.Model):
                 "clientSecret":subscription.latest_invoice.payment_intent.client_secret
                 }
         except Exception as e:
-            return jsonify(error={'message': e.user_message}), 400
+            return jsonify(error={'message': e}), 400
     @classmethod
     def create_paymentintent(cls,price,customer_stripe_id):
         intent=stripe.PaymentIntent.create(
