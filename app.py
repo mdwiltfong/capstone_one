@@ -144,7 +144,6 @@ def add_teacher():
 
             return redirect('/teacher/plan/prices')
         except IntegrityError as err:
-            print(err)
             db.session.rollback()
             existing = Teacher.query.filter_by(email=form.email.data).first()
             flash('* EMAIL IN USE: {} *'.format(existing.email))
@@ -156,17 +155,15 @@ def add_teacher():
 @app.route("/teacher/plan/prices",methods=["GET","POST"])
 def create_checkout_session():
     form=SubscriptionPlan()
-    products=stripe.Product.list(limit=2)
-    prices=stripe.Price.list(limit=2)
-    for price in prices.data:
-            if price["product"] == form.plan.data:
-                plan_price=price
 
     if form.validate_on_submit():
-        subscription=Teacher.create_subscription(session["curr_user"],plan_price)
+        price=stripe.Price.retrieve(form.plan.data)
+        subscription=Teacher.create_subscription(session["curr_user"],price)
         session["client_secret"]=subscription["clientSecret"]
         return redirect("/checkout")
-    return render_template('subscription_list.html',form=form,prices=prices.data,products=products.data)
+    return render_template('subscription_list.html',form=form)
+
+
 
 @app.route("/create-payment-intent",methods=["GET","POST"])
 def create_payment_intent():
@@ -176,12 +173,11 @@ def create_payment_intent():
 @app.route("/checkout",methods=["GET","POST"])
 def checkout():
     return render_template('checkout.html')
-@app.route("/teacher/plan/prices/success",methods=["GET","POST"])
+@app.route("/teacher/plan/prices/success",methods=["GET"])
 def success_page():
-    return ("payment_success.html")
-@app.route("/teacher/plan/prices/cancel",methods=["GET","POST"])
-def cancel_page():
-    return ("payment_cancel.html")
+    flash("Payment Succeeded!","success")
+    return redirect("/")
+
 
 
 @app.route("/teacher/login", methods=["GET","POST"])
