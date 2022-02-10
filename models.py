@@ -3,7 +3,7 @@ import json
 from locale import currency
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-from flask import jsonify,session 
+from flask import jsonify,session
 import stripe
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -27,6 +27,17 @@ class Teacher(db.Model):
     id = db.Column(
         db.Integer,
         primary_key=True
+    )
+
+    plan=db.Column(
+       db.Text,
+        nullable=True
+
+    )
+    
+    subscription=db.Column(
+        db.Text,
+        nullable=True
     )
 
     stripe_id=db.Column(
