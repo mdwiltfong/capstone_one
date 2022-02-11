@@ -173,7 +173,7 @@ def create_payment_intent():
 @app.route("/checkout",methods=["GET","POST"])
 def checkout():
     return render_template('checkout.html')
-@app.route("/teacher/plan/prices/success",methods=["GET"])
+@app.route("/teacher/plan/prices/success",methods=["GET","POST"])
 def success_page():
     flash("Payment Succeeded!","success")
     return redirect("/")
@@ -219,23 +219,13 @@ def webhook_received():
 
     data_object = data['object']
 
-    if event_type == 'invoice.paid':
-        # Used to provision services after the trial has ended.
-        # The status of the invoice will show up as paid. Store the status in your
-        # database to reference when a user accesses your service to avoid hitting rate
-        # limits.
-        print(data)
-
-    if event_type == 'invoice.payment_failed':
-        # If the payment fails or the customer does not have a valid payment method,
-        # an invoice.payment_failed event is sent, the subscription becomes past_due.
-        # Use this webhook to notify your user that their payment has
-        # failed and to retrieve new card details.
-        print(data)
-
-    if event_type == 'customer.subscription.deleted':
-        # handle subscription cancelled automatically based
-        # upon your subscription settings. Or if the user cancels it.
-        print(data)
+    if event_type == "customer.subscription.created":
+        subscription_id=data_object["id"]
+        customer_id=data_object["customer"]
+        teacher=Teacher.query.filter_by(stripe_id=customer_id).first()
+        teacher.subscription=subscription_id
+        teacher.plan= data_object["plan"]["id"]
+        db.session.add(teacher)
+        db.session.commit()
 
     return jsonify({'status': 'success'})
