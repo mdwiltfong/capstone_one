@@ -34,8 +34,12 @@ class Teacher(db.Model):
         nullable=True
 
     )
-    
-    subscription=db.Column(
+
+    subscription_status=db.Column(
+        db.Text,
+        nullable=True
+    )
+    subscription_id=db.Column(
         db.Text,
         nullable=True
     )
@@ -122,10 +126,11 @@ class Teacher(db.Model):
     @classmethod
     def authentication(cls,username,password):
             teacher=Teacher.query.filter_by(username=username).first()
+            subscription_status=teacher.subscription_status
             if teacher:
                 is_auth = bcrypt.check_password_hash(teacher.password, password)
                 
-                if is_auth:
+                if is_auth and subscription_status=="active":
                     return teacher
             return False
 
