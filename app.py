@@ -223,16 +223,18 @@ def webhook_received():
         subscription_id=data_object["id"]
         customer_id=data_object["customer"]
         teacher=Teacher.query.filter_by(stripe_id=customer_id).first()
-        teacher.subscription=subscription_id
+        teacher.subscription_id=subscription_id
         teacher.subscription_status=data_object["status"]
         teacher.plan= data_object["plan"]["id"]
         db.session.add(teacher)
         db.session.commit()
-        
+
     if event_type=="customer.subscription.updated":
         subscription_status=data_object["status"]
         customer_id=data_object["customer"]
         teacher=Teacher.query.filter_by(stripe_id=customer_id).first()
         teacher.subscription_status=subscription_status
+        db.session.add(teacher)
+        db.session.commit()
 
     return jsonify({'status': 'success'})
