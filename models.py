@@ -3,7 +3,7 @@ import json
 from locale import currency
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-from flask import jsonify,session 
+from flask import jsonify,session
 import stripe
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -27,6 +27,21 @@ class Teacher(db.Model):
     id = db.Column(
         db.Integer,
         primary_key=True
+    )
+
+    plan=db.Column(
+       db.Text,
+        nullable=True
+
+    )
+
+    subscription_status=db.Column(
+        db.Text,
+        nullable=True
+    )
+    subscription_id=db.Column(
+        db.Text,
+        nullable=True
     )
 
     stripe_id=db.Column(
@@ -111,10 +126,11 @@ class Teacher(db.Model):
     @classmethod
     def authentication(cls,username,password):
             teacher=Teacher.query.filter_by(username=username).first()
+            subscription_status=teacher.subscription_status
             if teacher:
                 is_auth = bcrypt.check_password_hash(teacher.password, password)
                 
-                if is_auth:
+                if is_auth and subscription_status=="active":
                     return teacher
             return False
 

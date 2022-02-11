@@ -173,7 +173,7 @@ def create_payment_intent():
 @app.route("/checkout",methods=["GET","POST"])
 def checkout():
     return render_template('checkout.html')
-@app.route("/teacher/plan/prices/success",methods=["GET"])
+@app.route("/teacher/plan/prices/success",methods=["GET","POST"])
 def success_page():
     flash("Payment Succeeded!","success")
     return redirect("/")
@@ -219,17 +219,22 @@ def webhook_received():
 
     data_object = data['object']
 
-    if event_type == 'invoice.payment_succeeded':
-        if data_object['billing_reason'] == 'subscription_create':
-            subscription_id = data_object['subscription']
-        payment_intent_id = data_object['payment_intent']
+    if event_type == "customer.subscription.created":
+        subscription_id=data_object["id"]
+        customer_id=data_object["customer"]
+        teacher=Teacher.query.filter_by(stripe_id=customer_id).first()
+        teacher.subscription_id=subscription_id
+        teacher.subscription_status=data_object["status"]
+        teacher.plan= data_object["plan"]["id"]
+        db.session.add(teacher)
+        db.session.commit()
 
-        # Retrieve the payment intent used to pay the subscription
-        payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+    if event_type=="customer.subscription.updated":
+        subscription_status=data_object["status"]
+        customer_id=data_object["customer"]
+        teacher=Teacher.query.filter_by(stripe_id=customer_id).first()
+        teacher.subscription_status=subscription_status
+        db.session.add(teacher)
+        db.session.commit()
 
-        # Set the default payment method
-        stripe.Subscription.modify(
-          subscription_id,
-          default_payment_method=payment_intent.payment_method
-        )   
     return jsonify({'status': 'success'})
