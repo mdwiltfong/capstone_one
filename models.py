@@ -34,7 +34,7 @@ class Teacher(db.Model):
         nullable=True
 
     )
-
+    
     subscription_status=db.Column(
         db.Text,
         nullable=True

@@ -188,7 +188,7 @@ def teacher_login():
         username=form.username.data
         teacher=Teacher.authentication(username,password)
         if teacher:
-            session["curr_user"]=teacher.id
+            session["curr_user"]=teacher.stripe_id
             session["subscription_status"]=teacher.subscription_status
             session["teacher"]=True
             flash("You've logged in!","success")
@@ -205,7 +205,8 @@ def teacher_profile():
         flash("You need to be logged in.", "danger")
         return redirect("/")
     
-    teacher=Teacher.query.filter_by(stripe_id=session.get("curr_user"))
+    teacher=Teacher.query.filter_by(stripe_id=session.get("curr_user")).first()
+    teacher.username
     return render_template("teacher_profile.html",teacher=teacher)
 
 
