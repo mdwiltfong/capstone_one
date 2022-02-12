@@ -35,7 +35,7 @@
         </li>
         {% if "teacher" in session %}
         <li class="nav-item">
-          <a href="/teacher/profile" class="nav-link">Profile Page</a>
+          <a href="/teacher/{{session['curr_user']}}/profile" class="nav-link">Profile Page</a>
         </li>
         {% endif %} {% else %}
         <li class="nav-item active">

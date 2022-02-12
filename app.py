@@ -8,7 +8,7 @@ from flask import Flask, render_template, flash, redirect, session, jsonify,requ
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db, Address
-from forms import AddCustomer,PaymentDetails,StudentLogin, SubscriptionPlan
+from forms import AddCustomer,PaymentDetails,StudentLogin, SubscriptionPlan,TeacherInvoice
 import stripe
 import json
 
@@ -163,8 +163,6 @@ def create_checkout_session():
         return redirect("/checkout")
     return render_template('subscription_list.html',form=form)
 
-
-
 @app.route("/create-payment-intent",methods=["GET","POST"])
 def create_payment_intent():
     return jsonify(client_secret=session["client_secret"])
@@ -177,6 +175,15 @@ def checkout():
 def success_page():
     flash("Payment Succeeded!","success")
     return redirect("/")
+
+######Invoices Created By Teachers#############
+
+@app.route("/teacher/invoice",methods=["GET","POST"])
+def teacher_invoice():
+    form = TeacherInvoice()
+    return render_template("invoice_form.html",form=form)
+
+
 
 
 
@@ -199,7 +206,7 @@ def teacher_login():
     
     return render_template("teacher_login.html",form=form)
 
-@app.route("/teacher/profile",methods=["GET","POST"])
+@app.route("/teacher/<int:id>/profile",methods=["GET","POST"])
 def teacher_profile():
     if "curr_user" not in session:
         flash("You need to be logged in.", "danger")
