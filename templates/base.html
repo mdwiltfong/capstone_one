@@ -40,7 +40,11 @@
           <li class="nav-item">
             <a class="nav-link" href="/logout">Logout</a>
           </li>
-          {% else %}
+          {% if "teacher" in session %}
+          <li class="nav-item">
+            <a href="/teacher/profile" class="nav-link">Profile Page</a>
+          </li>
+          {% endif %} {% else %}
           <li class="nav-item active">
             <a class="nav-link" href="/signup"
               >Signup <span class="sr-only"></span

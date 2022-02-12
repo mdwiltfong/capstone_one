@@ -189,6 +189,8 @@ def teacher_login():
         teacher=Teacher.authentication(username,password)
         if teacher:
             session["curr_user"]=teacher.id
+            session["subscription_status"]=teacher.subscription_status
+            session["teacher"]=True
             flash("You've logged in!","success")
             return redirect("/")
         else:
@@ -196,6 +198,15 @@ def teacher_login():
             return redirect("/teacher/login")
     
     return render_template("teacher_login.html",form=form)
+
+@app.route("/teacher/profile",methods=["GET","POST"])
+def teacher_profile():
+    if "curr_user" not in session:
+        flash("You need to be logged in.", "danger")
+        return redirect("/")
+    
+    teacher=Teacher.query.filter_by(stripe_id=session.get("curr_user"))
+    return render_template("teacher_profile.html",teacher=teacher)
 
 
 @app.route("/webhook",methods=["POST"])
