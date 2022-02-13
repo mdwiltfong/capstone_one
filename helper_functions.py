@@ -21,16 +21,16 @@ def dict_to_list(dict):
 def invoice_price(form):
     """ returns invoice price in cents"""
     hourly_rate=form.hourly_rate.data * 100
-    hours=form.hours.data
+    hours=form.sessions.data
     return hourly_rate*hours
 
-def create_product_stripe(service,teacher_stripeid,form):
+def create_product_stripe(teacher_stripeid,form):
     price=stripe.Price.create(
         unit_amount=invoice_price(form),
         currency="usd",
         recurring={"interval":form.cadence.data},
         product_data={
-            "name":service,
+            "name":form.service_field.data,
             "metadata":{
                 "customer":teacher_stripeid,
             }

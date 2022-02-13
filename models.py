@@ -114,10 +114,9 @@ class Teacher(db.Model):
     @classmethod
     def authentication(cls,username,password):
             teacher=Teacher.query.filter_by(username=username).first()
-            subscription_status=teacher.subscription_status
             if teacher:
                 is_auth = bcrypt.check_password_hash(teacher.password, password)
-                
+                subscription_status=teacher.subscription_status
                 if is_auth and subscription_status=="active":
                     return teacher
             return False
@@ -129,6 +128,14 @@ class Student(db.Model):
         db.Integer,
         autoincrement=True,
         primary_key=True
+    )
+    subscription_status=db.Column(
+        db.Text,
+        nullable=True
+    )
+    subscription_id=db.Column(
+        db.Text,
+        nullable=True
     )
     name=db.Column(
         db.Text,
@@ -155,7 +162,7 @@ class Student(db.Model):
     )
 
     def __repr__(self):
-        return f"<Student #{self.id}: {self.username}, {self.email}>"
+        return f"<Student #{self.id}: {self.name}, {self.email}>"
 
 
 
@@ -183,7 +190,7 @@ class Student(db.Model):
     @classmethod
     def create_subscription(cls,customer_id,form):      
         try:
-            price=create_product_stripe(form.service_field.data,customer_id,form)
+            price=create_product_stripe(customer_id,form)
             subscription=stripe.Subscription.create(
                 customer=customer_id,
                 items=[{
