@@ -176,7 +176,7 @@ class Student(db.Model):
 
 
     @classmethod
-    def signup(cls,form):
+    def signup(cls,form,teacher):
 
         new_student=Student(
             email=form.student_email.data,
@@ -191,6 +191,7 @@ class Student(db.Model):
                 }
             )
         new_student.stripe_id=customer.id
+        new_student.teacher.append(teacher)
         db.session.add(new_student)
         db.session.commit()
         return new_student

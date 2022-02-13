@@ -43,7 +43,7 @@
                 {% if teacher.students %}
                 <ul>
                     {% for student in teacher.students %}
-                    <li><a href="/student/{{student.is}}/profile">{{student.username}}</a></li>
+                    <li><a href="/student/{{student.is}}/profile">{{student.name}}</a></li>
                     {% endfor %}
                 </ul>
 

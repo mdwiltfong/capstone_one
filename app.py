@@ -152,7 +152,7 @@ def teacher_invoice():
         return redirect("/")
     teacher=Teacher.query.filter_by(stripe_id=session["curr_user"]).first()
     if form.validate_on_submit():
-        new_student=Student.signup(form)
+        new_student=Student.signup(form,teacher)
         resp= Student.create_subscription(new_student.stripe_id,form)
         if resp.get("error",False):
             flash("There was an issue making the Invoice","danger")
@@ -227,7 +227,7 @@ def webhook_received():
         else:
             customer=Student.query.filter_by(stripe_id=data_object["customer"]).first()
             Student.handle_subscription_created(customer.stripe_id,data_object)
-        ## TODO consolidate this logic into a class method
+        
         
 
     if event_type=="customer.subscription.updated":
