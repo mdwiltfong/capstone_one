@@ -213,7 +213,11 @@ class Student(db.Model):
                 "clientSecret":subscription.latest_invoice.payment_intent.client_secret
                 }
         except Exception as e:
-            return jsonify(error={'message': e}), 400
+            return {
+                "error":{
+                    "message":e
+                }
+            }
     @classmethod
     def authentication(cls,username,password):
       

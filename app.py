@@ -153,7 +153,13 @@ def teacher_invoice():
     teacher=Teacher.query.filter_by(stripe_id=session["curr_user"]).first()
     if form.validate_on_submit():
         new_student=Student.signup(form)
-        Student.create_subscription(new_student.stripe_id,form)
+        resp= Student.create_subscription(new_student.stripe_id,form)
+        if resp.get("error",False):
+            flash("There was an issue making the Invoice","danger")
+            return redirect(f'/teacher/{teacher.stripe_id}/profile')
+
+        flash("Invoice Sent","success")
+        return redirect(f'/teacher/{teacher.stripe_id}/profile')
     return render_template("invoice_form.html",form=form,teacher=teacher)
 
 
