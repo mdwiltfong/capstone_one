@@ -27,8 +27,10 @@ Invoice
                 </div>
 
                 {% endfor %}
-                <button class="btn btn-success btn-lg">Submit</button>
-                <button formaction="/teacher" class="btn btn-danger btn-lg">Cancel</button>
+                <button type="submit" class="btn btn-success btn-lg">Submit</button>
+                <!-- TODO #37 This cancel button is still trying to submit the form -->
+                <button type="submit" formaction="/teacher/{{teacher.stripe_id}}/profile"
+                    class="btn btn-danger btn-lg">Cancel</button>
             </form>
         </div>
 

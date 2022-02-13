@@ -1,12 +1,11 @@
-from datetime import datetime
-import json
-from locale import currency
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-from flask import jsonify,session
+from flask import jsonify
 import stripe
 import os
 from dotenv import load_dotenv, find_dotenv
+from helper_functions import create_product_stripe
+
 load_dotenv(find_dotenv())
 
 API_KEY=os.getenv('API_KEY')
@@ -26,6 +25,7 @@ class Teacher(db.Model):
 
     id = db.Column(
         db.Integer,
+        autoincrement=True,
         primary_key=True
     )
 
@@ -71,10 +71,9 @@ class Teacher(db.Model):
     
     students=db.relationship('Student',
                             secondary='teachers_students',
-                            backref='teachers'
+                            backref='teacher'
     )
 
-    address=db.relationship("Address")
 
     @classmethod
     def signup(cls,username,email,password):
@@ -113,17 +112,6 @@ class Teacher(db.Model):
         except Exception as e:
             return jsonify(error={'message': e}), 400
     @classmethod
-    def create_paymentintent(cls,price,customer_stripe_id):
-        intent=stripe.PaymentIntent.create(
-            amount=price["unit_amount"],
-            currency="usd",
-            automatic_payment_methods={"enabled":True},
-            customer=customer_stripe_id
-        )
-        return {
-            "client_secret":intent["client_secret"]
-            }
-    @classmethod
     def authentication(cls,username,password):
             teacher=Teacher.query.filter_by(username=username).first()
             subscription_status=teacher.subscription_status
@@ -139,7 +127,12 @@ class Student(db.Model):
 
     id = db.Column(
         db.Integer,
+        autoincrement=True,
         primary_key=True
+    )
+    name=db.Column(
+        db.Text,
+        nullable=False
     )
 
     stripe_id=db.Column(
@@ -153,87 +146,58 @@ class Student(db.Model):
     )
     username = db.Column(
         db.Text,
-        nullable=False,
+        nullable=True,
         unique=True,
     )
     password = db.Column(
         db.Text,
-        nullable=False,
+        nullable=True,
     )
 
-    
     def __repr__(self):
         return f"<Student #{self.id}: {self.username}, {self.email}>"
 
-    address=db.relationship("Address")
+
 
     @classmethod
-    def signup(cls,username,email,password):
-        hashed_pwd=bcrypt.generate_password_hash(password).decode('UTF-8')
+    def signup(cls,form):
+
         new_student=Student(
-            username=username,
-            email=email,
-            password=hashed_pwd          
+            email=form.student_email.data,
+            name=form.student_name.data
         )
-        db.session.add(new_student)
-        return new_student
-
-        ## TO-DO: add more error handling to this method versus on ther server. Throw-catch methodology. 
-    @classmethod
-    def stripe_signup(cls,student,form):
-        try:
-            customer=stripe.Customer.create(
-                name= student.address[0].name,
-                email=student.email,
+        customer=stripe.Customer.create(
+                email=new_student.email,
                 metadata={
-                    "username": student.username,
-                    "db_id":student.id,
+                    "username": new_student.username,
+                    "db_id":new_student.id,
                     "customer_type":"student"
-                },
-                address={
-                    "city":student.address[0].city,
-                    "country": 'US',
-                    "line1":student.address[0].address_1,
-                    "line2":student.address[0].address_2,
-                    "postal_code":student.address[0].postal_code,
-                    "state":student.address[0].state
                 }
             )
-            student_address=student.address[0]
-            card=stripe.PaymentMethod.create(
-                    type="card",
-                    billing_details={
-                        "address":{
-                            "city":student_address.city,
-                            "country":"US",
-                            "line1":student_address.address_1,
-                            "line2":student_address.address_2,
-                            "postal_code":student_address.postal_code,
-                            "state":student_address.state
-                        }
-                    },
-                    card={
-                        "number": form.card_number.data,
-                        "exp_month":f"{form.expiration.data : %m}".strip(),
-                        "exp_year":f"{form.expiration.data : %y}".strip()
-                    }
-                ) or None
-            if card:
-                    payment_method=stripe.PaymentMethod.attach(
-                    card.id,
-                    customer=customer.stripe_id
-                )
-            
-            return {
-                "customer":customer,
-                "card":card,
-                "payment_method":payment_method
-            }
-        except Exception as err:
-            print(err)
-        else:
-            print("Stripe Sign On done")
+        new_student.stripe_id=customer.id
+        db.session.add(new_student)
+        db.session.commit()
+        return new_student
 
+
+    @classmethod
+    def create_subscription(cls,customer_id,form):      
+        try:
+            price=create_product_stripe(form.service_field.data,customer_id,form)
+            subscription=stripe.Subscription.create(
+                customer=customer_id,
+                items=[{
+                    'price': price["id"]
+                }],
+                payment_behavior='default_incomplete',
+                expand=['latest_invoice.payment_intent']
+            )
+            return {
+                "subscriptionId":subscription.id,
+                "clientSecret":subscription.latest_invoice.payment_intent.client_secret
+                }
+        except Exception as e:
+            return jsonify(error={'message': e}), 400
     @classmethod
     def authentication(cls,username,password):
       
@@ -247,6 +211,49 @@ class Student(db.Model):
 
 
 
+
+class Invoice(db.Model):
+    __tablename__="invoices"
+
+    id = db.Column(
+        db.Integer,
+        autoincrement=True,
+        primary_key=True
+    )
+    
+    teacher_id=db.Column(db.Integer,
+                        db.ForeignKey("teachers.id", ondelete="cascade"),        
+            )
+    student_id=db.Column(db.Integer,
+                        db.ForeignKey("students.id",ondelete="cascade"),
+    )
+    service=db.Column(
+        db.Text
+    )
+
+    hourly_rate=db.Column(
+        db.Integer
+    )
+
+    start_date=db.Column(
+        db.DateTime
+    )
+
+    cadence=db.Column(
+        db.Text
+    )
+
+    def __repr__(self):
+        return f"<Invoice #{self.id}: {self.student_id}, {self.id}>"
+        
+    student=db.relationship('Student',
+                            backref='invoices'
+    )
+    teacher=db.relationship('Teacher',
+                                backref="invoices"
+    )
+
+
 class Teacher_Student(db.Model):
     __tablename__='teachers_students'
     teacher_id=db.Column(db.Integer,
@@ -257,59 +264,3 @@ class Teacher_Student(db.Model):
                         db.ForeignKey("students.id",ondelete="cascade"),
                         primary_key=True
     )
-
-class Address(db.Model):
-    __tablename__='addresses'
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-
-    student_id=db.Column(db.Integer,
-                        db.ForeignKey("students.id",ondelete="cascade")
-    )
-
-    teacher_id=db.Column(db.Integer,
-                        db.ForeignKey("teachers.id", ondelete="cascade")
-    )
-
-    name=db.Column(
-        db.String,
-        nullable=False
-    )
-
-    city=db.Column(
-        db.Text,
-        nullable=False
-    )
-
-    country=db.Column(
-        db.String(50),
-        nullable=False
-    )
-
-    address_1=db.Column(
-        db.Text,
-        nullable=False
-    )
-
-    address_2=db.Column(
-        db.Text,
-        nullable=True
-    )
-
-    postal_code=db.Column(
-        db.Text,
-        nullable=False
-    )
-
-    state=db.Column(
-        db.Text,
-        nullable=False
-    )
-
-    def __repr__(self):
-        return f"<Address #{self.id}: {self.student_id}, {self.id}>"
-
-
