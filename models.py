@@ -207,11 +207,12 @@ class Student(db.Model):
                     'price': price["id"]
                 }],
                 payment_behavior='default_incomplete',
+                collection_method="send_invoice",
+                days_until_due=0,
                 expand=['latest_invoice.payment_intent']
             )
             return {
-                "subscriptionId":subscription.id,
-                "clientSecret":subscription.latest_invoice.payment_intent.client_secret
+                "subscriptionId":subscription.id
                 }
         except Exception as e:
             return {
@@ -232,14 +233,11 @@ class Student(db.Model):
     @classmethod
     def handle_subscription_created(cls,customer_id,data_object):
         subscription_id=data_object["id"]
-        customer_id=data_object["customer"]
         student=Student.query.filter_by(stripe_id=customer_id).first()
         student.subscription_id=subscription_id
         student.subscription_status=data_object["status"]
-        student.plan= data_object["plan"]["id"]
         db.session.add(student)
         db.session.commit()
-
 
 class Invoice(db.Model):
     __tablename__="invoices"
