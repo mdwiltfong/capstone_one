@@ -102,8 +102,8 @@ class Teacher(db.Model):
                 items=[{
                     'price': price["id"]
                 }],
-                payment_behavior='default_incomplete',
-                expand=['latest_invoice.payment_intent']
+                payment_behavior='default_incomplete',  
+                expand=['latest_invoice.payment_intent',]
             )
             return {
                 "subscriptionId":subscription.id,
@@ -120,7 +120,16 @@ class Teacher(db.Model):
                 if is_auth and subscription_status=="active":
                     return teacher
             return False
-
+    @classmethod
+    def handle_subscription_created(cls,customer_id,data_object):
+        subscription_id=data_object["id"]
+        customer_id=data_object["customer"]
+        teacher=Teacher.query.filter_by(stripe_id=customer_id).first()
+        teacher.subscription_id=subscription_id
+        teacher.subscription_status=data_object["status"]
+        teacher.plan= data_object["plan"]["id"]
+        db.session.add(teacher)
+        db.session.commit()
 class Student(db.Model):
     __tablename__='students'
 
@@ -215,8 +224,16 @@ class Student(db.Model):
                 if is_auth:
                     return student
             return False
-
-
+    @classmethod
+    def handle_subscription_created(cls,customer_id,data_object):
+        subscription_id=data_object["id"]
+        customer_id=data_object["customer"]
+        student=Student.query.filter_by(stripe_id=customer_id).first()
+        student.subscription_id=subscription_id
+        student.subscription_status=data_object["status"]
+        student.plan= data_object["plan"]["id"]
+        db.session.add(student)
+        db.session.commit()
 
 
 class Invoice(db.Model):

@@ -199,7 +199,10 @@ def webhook_received():
         signature = request.headers.get('stripe-signature')
         try:
             event = stripe.Webhook.construct_event(
-                payload=request.data, sig_header=signature, secret=WEBHOOK_SECRET)
+                payload=request.data, 
+                sig_header=signature, 
+                secret=WEBHOOK_SECRET                
+                )
             data = event['data']
         except Exception as e:
             return e
@@ -212,14 +215,14 @@ def webhook_received():
     data_object = data['object']
 
     if event_type == "customer.subscription.created":
-        subscription_id=data_object["id"]
-        customer_id=data_object["customer"]
-        teacher=Teacher.query.filter_by(stripe_id=customer_id).first()
-        teacher.subscription_id=subscription_id
-        teacher.subscription_status=data_object["status"]
-        teacher.plan= data_object["plan"]["id"]
-        db.session.add(teacher)
-        db.session.commit()
+        customer=Teacher.query.filter_by(stripe_id=data_object["customer"]).first()
+        if customer:
+            Teacher.handle_subscription_created(customer.stripe_id,data_object)
+        else:
+            customer=Student.query.filter_by(stripe_id=data_object["customer"]).first()
+            Student.handle_subscription_created(customer.stripe_id,data_object)
+        ## TODO consolidate this logic into a class method
+        
 
     if event_type=="customer.subscription.updated":
         subscription_status=data_object["status"]
