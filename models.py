@@ -200,6 +200,8 @@ class Student(db.Model):
     @classmethod
     def create_subscription(cls,customer_id,form):      
         try:
+
+            ## TODO For some reason the subscriptions are created as 'active' despite having an open invoice. 
             price=create_product_stripe(customer_id,form)
             subscription=stripe.Subscription.create(
                 customer=customer_id,
@@ -208,9 +210,12 @@ class Student(db.Model):
                 }],
                 payment_behavior='default_incomplete',
                 collection_method="send_invoice",
-                days_until_due=0,
+                days_until_due=2,
                 expand=['latest_invoice.payment_intent']
             )
+
+
+            
             return {
                 "subscriptionId":subscription.id
                 }
