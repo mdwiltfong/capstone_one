@@ -83,17 +83,30 @@ class Teacher(db.Model):
             email=email,
             password=hashed_pwd          
         )
-        customer=stripe.Customer.create(
-                email=new_teacher.email,
-                metadata={
-                    "username": new_teacher.username,
-                    "db_id":new_teacher.id,
-                    "customer_type":"teacher"
-                }
-            )
-        new_teacher.stripe_id=customer.id
-        db.session.add(new_teacher)
-        return new_teacher
+        new_account=stripe.Account.create(
+            type="express",
+            country="US",
+            email=email,
+            capabilities={
+                "card_payments":{"requested":True},
+                "transfers":{"requested":True}
+            },
+            business_type="individual",            
+        )
+
+        ## TODO #41 We will need to change the Teacher model to handle this new onboarding
+        acc_link=stripe.AccountLink.create(
+            account=new_account["id"],
+            refresh_url="http://127.0.0.1:5000/teacher/signup",
+            return_url="http://127.0.0.1:5000/teacher/signup/success",
+            type="account_onboarding"
+        )
+
+        return {
+            "new_teacher":new_teacher,
+            "new_account":new_account,
+            "acc_link":acc_link
+        }
     @classmethod
     def create_subscription(cls,customer_id,price):      
         try:

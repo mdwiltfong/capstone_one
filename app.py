@@ -103,6 +103,7 @@ def add_teacher():
                 password=form.password.data
             )
 
+            session["curr_user"]=new_teacher_acct["new_account"]["id"]
             
 
             return redirect(new_teacher_acct["acc_link"]["url"])
@@ -114,6 +115,10 @@ def add_teacher():
 
     return render_template('add_teacher.html',form=form)
 
+@app.route('/teacher/signup/success',methods=["GET"])
+def successful_onboard():
+    flash("Successful Onboarding","success")
+    return redirect("/")
 
 @app.route("/teacher/plan/prices",methods=["GET","POST"])
 def create_checkout_session():
