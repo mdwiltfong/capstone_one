@@ -97,18 +97,15 @@ def add_teacher():
     form=AddCustomer()
     if form.validate_on_submit():
         try:
-            new_teacher=Teacher.signup(
+            new_teacher_acct=Teacher.signup(
                 username=form.username.data,
                 email=form.email.data,
                 password=form.password.data
             )
 
-            db.session.commit()
+            
 
-            session["curr_user"]=new_teacher.stripe_id
-            session["teacher"]=True
-
-            return redirect('/teacher/plan/prices')
+            return redirect(new_teacher_acct["acc_link"]["url"])
         except IntegrityError as err:
             db.session.rollback()
             existing = Teacher.query.filter_by(email=form.email.data).first()
