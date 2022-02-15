@@ -1,6 +1,7 @@
+from ssl import create_default_context
 from unicodedata import name
 from flask_wtf import FlaskForm
-from wtforms import StringField,SelectField, PasswordField, DateField,RadioField
+from wtforms import StringField,SelectField, PasswordField, DateField,RadioField, DecimalField,DateField
 from wtforms.validators import InputRequired, Email, Optional,Length
 from countries import US_STATES,months
 from helper_functions import dict_to_list
@@ -28,3 +29,11 @@ class StudentLogin(FlaskForm):
 
 class SubscriptionPlan(FlaskForm):
     plan = RadioField("Subscription Options",choices=[('price_1KNUuRDBo40mpW7dT4BG7Kzl','Basic Plan'),('price_1KNUv7DBo40mpW7dDF2Vuq81',"Premium Plan")])
+
+class TeacherInvoice(FlaskForm):
+    student_name=StringField("Student Name", validators=[InputRequired()])
+    student_email=StringField("Student Email",validators=[InputRequired(),Email()])
+    service_field=StringField("Service",validators=[InputRequired()])
+    hourly_rate=DecimalField("Hourly Rate",validators=[InputRequired()])
+    sessions=DecimalField("Number of Sessions",validators=[InputRequired()])    
+    cadence=SelectField("Cadence",choices=[("month","Monthly"),("week","Weekly")])

@@ -1,14 +1,12 @@
 
-from code import interact
-from crypt import methods
 import os
 import pdb
-from dotenv import load_dotenv, find_dotenv
 from flask import Flask, render_template, flash, redirect, session, jsonify,request
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-from models import Teacher, Student,db,connect_db, Address
-from forms import AddCustomer,PaymentDetails,StudentLogin, SubscriptionPlan
+from models import Teacher, Student,db,connect_db
+from forms import AddCustomer,PaymentDetails,StudentLogin, SubscriptionPlan,TeacherInvoice
+from helper_functions import invoice_price
 import stripe
 import json
 
@@ -37,38 +35,6 @@ def homepage():
 @app.route("/signup")
 def signup():
     return render_template("signup.html",message="Hey")
-
-@app.route('/get-started/payment',methods=["GET","POST"])
-def customer_billing():
-    form=PaymentDetails()
-    
-    ## TODO #18 This rooute doesn't need this much logic. Instead route `/teacher/login` and `student/login` need this 
-    if session.get('student',None) or session.get('teacher',None):
-        client=Student.query.get(session["curr_user"]) or Teacher.query.get(session["curr_user"])
-        if client.stripe_id:
-            return redirect('/')
-    else:
-        flash('You need to be logged in')
-        return redirect('/', code=404)
-
-    if form.validate_on_submit():
-            new_address=Address(
-                city=form.city.data,
-                name=form.name.data,
-                country=form.country.data,
-                address_1=form.address_1.data,
-                postal_code=form.postal_code.data,
-                state=form.state.data,
-                address_2= form.address_2.data or None
-            )
-            client.address.append(new_address)
-            new_stripe_customer=Student.stripe_signup(client,form)
-            client.stripe_id=new_stripe_customer["customer"].id
-            db.session.add(client)
-            db.session.commit()
-            flash("You've registered!","success")            
-            return redirect('/')
-    return render_template('add_payment_details.html',form=form)
 
 
 @app.route('/logout')
@@ -163,8 +129,6 @@ def create_checkout_session():
         return redirect("/checkout")
     return render_template('subscription_list.html',form=form)
 
-
-
 @app.route("/create-payment-intent",methods=["GET","POST"])
 def create_payment_intent():
     return jsonify(client_secret=session["client_secret"])
@@ -178,6 +142,28 @@ def success_page():
     flash("Payment Succeeded!","success")
     return redirect("/")
 
+######Invoices Created By Teachers#############
+
+@app.route("/teacher/invoice",methods=["GET","POST"])
+def teacher_invoice():
+    form = TeacherInvoice()
+    if "curr_user" not in session:
+        flash("You need to be logged in","danger")
+        return redirect("/")
+    teacher=Teacher.query.filter_by(stripe_id=session["curr_user"]).first()
+    if form.validate_on_submit():
+        new_student=Student.signup(form,teacher)
+        resp= Student.create_subscription(new_student.stripe_id,form)
+        if resp.get("error",False):
+            flash("There was an issue making the Invoice","danger")
+            return redirect(f'/teacher/{teacher.stripe_id}/profile')
+
+        flash("Invoice Sent","success")
+        return redirect(f'/teacher/{teacher.stripe_id}/profile')
+    return render_template("invoice_form.html",form=form,teacher=teacher)
+
+
+
 
 
 @app.route("/teacher/login", methods=["GET","POST"])
@@ -188,7 +174,9 @@ def teacher_login():
         username=form.username.data
         teacher=Teacher.authentication(username,password)
         if teacher:
-            session["curr_user"]=teacher.id
+            session["curr_user"]=teacher.stripe_id
+            session["subscription_status"]=teacher.subscription_status
+            session["teacher"]=True
             flash("You've logged in!","success")
             return redirect("/")
         else:
@@ -196,6 +184,16 @@ def teacher_login():
             return redirect("/teacher/login")
     
     return render_template("teacher_login.html",form=form)
+
+@app.route("/teacher/<stripe_id>/profile",methods=["GET","POST"])
+def teacher_profile(stripe_id):
+    if "curr_user" not in session:
+        flash("You need to be logged in.", "danger")
+        return redirect("/")
+    
+    teacher=Teacher.query.filter_by(stripe_id=stripe_id).first()
+    teacher.username
+    return render_template("teacher_profile.html",teacher=teacher)
 
 
 @app.route("/webhook",methods=["POST"])
@@ -207,7 +205,10 @@ def webhook_received():
         signature = request.headers.get('stripe-signature')
         try:
             event = stripe.Webhook.construct_event(
-                payload=request.data, sig_header=signature, secret=WEBHOOK_SECRET)
+                payload=request.data, 
+                sig_header=signature, 
+                secret=WEBHOOK_SECRET                
+                )
             data = event['data']
         except Exception as e:
             return e
@@ -220,14 +221,14 @@ def webhook_received():
     data_object = data['object']
 
     if event_type == "customer.subscription.created":
-        subscription_id=data_object["id"]
-        customer_id=data_object["customer"]
-        teacher=Teacher.query.filter_by(stripe_id=customer_id).first()
-        teacher.subscription_id=subscription_id
-        teacher.subscription_status=data_object["status"]
-        teacher.plan= data_object["plan"]["id"]
-        db.session.add(teacher)
-        db.session.commit()
+        customer=Teacher.query.filter_by(stripe_id=data_object["customer"]).first()
+        if customer:
+            Teacher.handle_subscription_created(customer.stripe_id,data_object)
+        else:
+            customer=Student.query.filter_by(stripe_id=data_object["customer"]).first()
+            Student.handle_subscription_created(customer.stripe_id,data_object)
+        
+        
 
     if event_type=="customer.subscription.updated":
         subscription_status=data_object["status"]
