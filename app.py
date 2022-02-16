@@ -2,7 +2,7 @@
 from email.quoprimime import quote
 import os
 import pdb
-from flask import Flask, render_template, flash, redirect, session, jsonify,request
+from flask import Flask, render_template, flash, redirect, session, jsonify,request,send_file
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db
@@ -162,9 +162,14 @@ def teacher_invoice():
             flash("There was an issue making the Invoice","danger")
             return redirect(f'/teacher/{teacher.account_id}/profile')
 
-        flash("Invoice Sent","success")
-        return redirect(f'/teacher/{teacher.account_id}/profile')
+        #flash("Invoice Sent","success")
+        #return redirect(f'/teacher/{teacher.account_id}/profile')
+        return redirect("/teacher/quote/download")
     return render_template("invoice_form.html",form=form,teacher=teacher)
+
+@app.route("/teacher/quote/download")
+def teacher_quote():
+    return send_file("tmp.pdf")
 
 
 
