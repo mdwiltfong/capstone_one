@@ -104,7 +104,7 @@ def add_teacher():
             )
 
             session["curr_user"]=new_teacher_acct["new_account"]["id"]
-            
+            session["teacher"]=True
 
             return redirect(new_teacher_acct["acc_link"]["url"])
         except IntegrityError as err:
@@ -158,10 +158,10 @@ def teacher_invoice():
         resp= Student.create_subscription(new_student.stripe_id,form)
         if resp.get("error",False):
             flash("There was an issue making the Invoice","danger")
-            return redirect(f'/teacher/{teacher.stripe_id}/profile')
+            return redirect(f'/teacher/{teacher.account_id}/profile')
 
         flash("Invoice Sent","success")
-        return redirect(f'/teacher/{teacher.stripe_id}/profile')
+        return redirect(f'/teacher/{teacher.account_id}/profile')
     return render_template("invoice_form.html",form=form,teacher=teacher)
 
 

@@ -10,9 +10,9 @@ db.create_all()
 
 password=bcrypt.generate_password_hash('123456').decode('UTF-8')
 
-t1=Teacher(subscription_status="incomplete",email='teach1@teacher.com', username='homeworkqueen92', password=password)
-t2=Teacher(subscription_status="incomplete",email='teach2@teacher.com', username='YourIdealTeacher', password=password)
-t3=Teacher(subscription_status="incomplete",email='teach3@teacher.com', username='ProfessorMcGonagall', password=password)
+t1=Teacher(account_status="complete",email='teach1@teacher.com', username='homeworkqueen92', password=password)
+t2=Teacher(account_status="complete",email='teach2@teacher.com', username='YourIdealTeacher', password=password)
+t3=Teacher(account_status="complete",email='teach3@teacher.com', username='ProfessorMcGonagall', password=password)
 
 s1=Student(name="Ron Weasley",email="angryteen@students.com",username="RonWeasley",password=password)
 s2=Student(name="Harry Potter",email="teachme@students.com",username="HarryPotter",password=password)

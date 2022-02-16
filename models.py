@@ -29,22 +29,12 @@ class Teacher(db.Model):
         primary_key=True
     )
 
-    plan=db.Column(
-       db.Text,
-        nullable=True
-
-    )
     
-    subscription_status=db.Column(
+    account_status=db.Column(
         db.Text,
         nullable=True
     )
-    subscription_id=db.Column(
-        db.Text,
-        nullable=True
-    )
-
-    stripe_id=db.Column(
+    account_id=db.Column(
         db.Text,
         nullable=True
     )
@@ -101,6 +91,11 @@ class Teacher(db.Model):
             return_url="http://127.0.0.1:5000/teacher/signup/success",
             type="account_onboarding"
         )
+
+        new_teacher.account_status='restricted'
+        new_teacher.account_id=new_account["id"]
+        db.session.add(new_teacher)
+        db.session.commit()
 
         return {
             "new_teacher":new_teacher,
