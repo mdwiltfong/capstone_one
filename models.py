@@ -197,8 +197,7 @@ class Student(db.Model):
                     "username": new_student.username,
                     "db_id":new_student.id,
                     "customer_type":"student"
-                },
-                stripe_account='acct_1KTeASRXYxEnAH8a'
+                }
             )
         new_student.stripe_id=customer.id
         new_student.teacher.append(teacher)
@@ -206,7 +205,24 @@ class Student(db.Model):
         db.session.commit()
         return new_student
 
-
+    @classmethod
+    def create_quote(cls,student,form,account_id):
+        price=create_product_stripe(account_id,form)
+        quote=stripe.Quote.create(
+            customer=student.stripe_id,
+            line_items=[{
+                "price": price["id"],"quantity":1
+            }],
+            transfer_data={
+                "destination":account_id
+            }
+        )
+        stripe.Quote.finalize_quote(quote["id"])
+        resp=stripe.Quote.pdf(quote["id"])
+        file=open("tmp.pdf","wb")
+        file.write(resp.io.read())
+        file.close()
+        return quote
     @classmethod
     def create_subscription(cls,customer_id,form,account_id):      
         try:

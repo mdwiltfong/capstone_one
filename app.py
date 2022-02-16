@@ -1,4 +1,5 @@
 
+from email.quoprimime import quote
 import os
 import pdb
 from flask import Flask, render_template, flash, redirect, session, jsonify,request
@@ -155,8 +156,9 @@ def teacher_invoice():
     teacher=Teacher.query.filter_by(account_id=session["curr_user"]).first()
     if form.validate_on_submit():
         new_student=Student.signup(form,teacher)
-        resp= Student.create_subscription(new_student.stripe_id,form,session["curr_user"])
-        if resp.get("error",False):
+        quote=Student.create_quote(new_student,form,session["curr_user"])
+        #resp= Student.create_subscription(new_student.stripe_id,form,session["curr_user"])
+        if quote.get("error",False):
             flash("There was an issue making the Invoice","danger")
             return redirect(f'/teacher/{teacher.account_id}/profile')
 
