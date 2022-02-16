@@ -1,7 +1,7 @@
 from itertools import product
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-from flask import jsonify
+from flask import jsonify,send_file
 import stripe
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -222,6 +222,7 @@ class Student(db.Model):
         file=open("tmp.pdf","wb")
         file.write(resp.io.read())
         file.close()
+    
         return quote
     @classmethod
     def create_subscription(cls,customer_id,form,account_id):      
