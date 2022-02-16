@@ -152,10 +152,10 @@ def teacher_invoice():
     if "curr_user" not in session:
         flash("You need to be logged in","danger")
         return redirect("/")
-    teacher=Teacher.query.filter_by(stripe_id=session["curr_user"]).first()
+    teacher=Teacher.query.filter_by(account_id=session["curr_user"]).first()
     if form.validate_on_submit():
         new_student=Student.signup(form,teacher)
-        resp= Student.create_subscription(new_student.stripe_id,form)
+        resp= Student.create_subscription(new_student.stripe_id,form,session["curr_user"])
         if resp.get("error",False):
             flash("There was an issue making the Invoice","danger")
             return redirect(f'/teacher/{teacher.account_id}/profile')
@@ -187,13 +187,13 @@ def teacher_login():
     
     return render_template("teacher_login.html",form=form)
 
-@app.route("/teacher/<stripe_id>/profile",methods=["GET","POST"])
-def teacher_profile(stripe_id):
+@app.route("/teacher/<account_id>/profile",methods=["GET","POST"])
+def teacher_profile(account_id):
     if "curr_user" not in session:
         flash("You need to be logged in.", "danger")
         return redirect("/")
     
-    teacher=Teacher.query.filter_by(stripe_id=stripe_id).first()
+    teacher=Teacher.query.filter_by(account_id=account_id).first()
     teacher.username
     return render_template("teacher_profile.html",teacher=teacher)
 

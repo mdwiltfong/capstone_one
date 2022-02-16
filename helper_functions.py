@@ -24,17 +24,15 @@ def invoice_price(form):
     hours=form.sessions.data
     return hourly_rate*hours
 
-def create_product_stripe(teacher_stripeid,form):
+def create_product_stripe(teacher_accountid,form):
     price=stripe.Price.create(
         unit_amount=invoice_price(form),
         currency="usd",
-        recurring={"interval":form.cadence.data},
         product_data={
-            "name":form.service_field.data,
-            "metadata":{
-                "customer":teacher_stripeid,
-            }
-        }
+                    "name":form.service_field.data,
+                },
+        recurring={"interval":form.cadence.data},
+        stripe_account='acct_1KTeASRXYxEnAH8a'
     )
     return price
 

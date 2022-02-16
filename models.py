@@ -1,3 +1,4 @@
+from itertools import product
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask import jsonify
@@ -124,8 +125,8 @@ class Teacher(db.Model):
             teacher=Teacher.query.filter_by(username=username).first()
             if teacher:
                 is_auth = bcrypt.check_password_hash(teacher.password, password)
-                subscription_status=teacher.subscription_status
-                if is_auth and subscription_status=="active":
+                account_status=teacher.account_status
+                if is_auth and account_status=="complete":
                     return teacher
             return False
     @classmethod
@@ -196,7 +197,8 @@ class Student(db.Model):
                     "username": new_student.username,
                     "db_id":new_student.id,
                     "customer_type":"student"
-                }
+                },
+                stripe_account='acct_1KTeASRXYxEnAH8a'
             )
         new_student.stripe_id=customer.id
         new_student.teacher.append(teacher)
@@ -206,7 +208,7 @@ class Student(db.Model):
 
 
     @classmethod
-    def create_subscription(cls,customer_id,form):      
+    def create_subscription(cls,customer_id,form,account_id):      
         try:
 
             ## TODO For some reason the subscriptions are created as 'active' despite having an open invoice. 
@@ -216,10 +218,11 @@ class Student(db.Model):
                 items=[{
                     'price': price["id"]
                 }],
-                payment_behavior='default_incomplete',
                 collection_method="send_invoice",
-                days_until_due=2,
-                expand=['latest_invoice.payment_intent']
+                days_until_due=1,
+                expand=['latest_invoice.payment_intent'],
+                application_fee_percent=10,
+                stripe_account=account_id
             )
 
 
