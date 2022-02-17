@@ -6,8 +6,8 @@ from flask import Flask, render_template, flash, redirect, session, jsonify,requ
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db
-from forms import AddCustomer,PaymentDetails,StudentLogin, SubscriptionPlan,TeacherInvoice
-from helper_functions import invoice_price
+from forms import AddCustomer,StudentLogin, SubscriptionPlan,TeacherInvoice,QuoteForm
+from helper_functions import convert_quote
 import stripe
 import json
 
@@ -171,6 +171,14 @@ def teacher_invoice():
 def teacher_quote():
     return send_file("tmp.pdf")
 
+@app.route("/convert_quote",methods=["GET","POST"])
+def convert_quote():
+    form=QuoteForm()
+    if form.validate_on_submit():
+        convert_quote(form.quote_number.data)
+
+    return render_template("convert_quote.html",form=form)
+
 
 
 
@@ -201,7 +209,6 @@ def teacher_profile(account_id):
         return redirect("/")
     
     teacher=Teacher.query.filter_by(account_id=account_id).first()
-    teacher.username
     return render_template("teacher_profile.html",teacher=teacher)
 
 

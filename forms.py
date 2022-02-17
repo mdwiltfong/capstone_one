@@ -37,3 +37,7 @@ class TeacherInvoice(FlaskForm):
     hourly_rate=DecimalField("Hourly Rate",validators=[InputRequired()])
     sessions=DecimalField("Number of Sessions",validators=[InputRequired()])    
     cadence=SelectField("Cadence",choices=[("month","Monthly"),("week","Weekly")])
+
+class QuoteForm(FlaskForm):
+    student_name=StringField("Student Name", validators=[InputRequired()])
+    student_email=StringField("Student Email",validators=[InputRequired(),Email()])

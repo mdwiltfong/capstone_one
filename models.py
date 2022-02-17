@@ -155,6 +155,10 @@ class Student(db.Model):
         db.Text,
         nullable=True
     )
+    active_quote_id=db.Column(
+        db.Text,
+        nullable=True
+    )
     name=db.Column(
         db.Text,
         nullable=False
@@ -215,9 +219,14 @@ class Student(db.Model):
             }],
             transfer_data={
                 "destination":account_id
-            }
+            },
+
         )
-        stripe.Quote.finalize_quote(quote["id"])
+
+        student.active_quote_id=quote["id"]
+        db.session.add(student)
+        db.session.commit()
+        quote=stripe.Quote.finalize_quote(quote["id"])
         resp=stripe.Quote.pdf(quote["id"])
         file=open("tmp.pdf","wb")
         file.write(resp.io.read())
