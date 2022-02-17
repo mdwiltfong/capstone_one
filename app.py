@@ -191,8 +191,8 @@ def teacher_login():
         username=form.username.data
         teacher=Teacher.authentication(username,password)
         if teacher:
-            session["curr_user"]=teacher.stripe_id
-            session["subscription_status"]=teacher.subscription_status
+            session["curr_user"]=teacher.account_id
+            session["subscription_status"]=teacher.account_status
             session["teacher"]=True
             flash("You've logged in!","success")
             return redirect("/")
