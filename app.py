@@ -34,7 +34,7 @@ def homepage():
 
 @app.route("/signup")
 def signup():
-    return render_template("signup.html",message="Hey")
+    return render_template("signup.html")
 
 
 @app.route('/logout')
