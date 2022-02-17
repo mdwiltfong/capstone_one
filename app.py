@@ -202,6 +202,19 @@ def teacher_login():
     
     return render_template("teacher_login.html",form=form)
 
+@app.route("/quotes",methods=["POST"])
+def quote_list():
+    data=request.json
+    student_email=data['student_email']
+    student_name=data["student_name"]
+    try:
+        student=Student.query.filter(Student.email==student_email,Student.name==student_name).first()
+        quote=stripe.Quote.retrieve(student.active_quote_id)
+        if student is None:
+            raise Exception
+        return jsonify(quote=quote)
+    except Exception as e:
+        return jsonify(error='Hmm, there was an issue with your request')
 @app.route("/teacher/<account_id>/profile",methods=["GET","POST"])
 def teacher_profile(account_id):
     if "curr_user" not in session:
