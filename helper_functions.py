@@ -32,6 +32,7 @@ def create_product_stripe(teacher_accountid,form):
                     "name":form.service_field.data,
                 },
         recurring={"interval":form.cadence.data},
+        stripe_account=teacher_accountid
     )
     return price
 

@@ -201,7 +201,8 @@ class Student(db.Model):
                     "username": new_student.username,
                     "db_id":new_student.id,
                     "customer_type":"student"
-                }
+                },
+                stripe_account=teacher.account_id
             )
         new_student.stripe_id=customer.id
         new_student.teacher.append(teacher)
@@ -217,17 +218,19 @@ class Student(db.Model):
             line_items=[{
                 "price": price["id"],"quantity":1
             }],
-            transfer_data={
-                "destination":account_id
-            },
-
+            stripe_account=account_id
         )
 
         student.active_quote_id=quote["id"]
         db.session.add(student)
         db.session.commit()
-        quote=stripe.Quote.finalize_quote(quote["id"])
-        resp=stripe.Quote.pdf(quote["id"])
+        quote=stripe.Quote.finalize_quote(
+            quote["id"],
+            stripe_account=account_id
+            )
+        resp=stripe.Quote.pdf(quote["id"],
+        stripe_account=account_id
+        )
         file=open("tmp.pdf","wb")
         file.write(resp.io.read())
         file.close()

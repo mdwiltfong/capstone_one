@@ -171,13 +171,6 @@ def teacher_invoice():
 def teacher_quote():
     return send_file("tmp.pdf")
 
-@app.route("/convert_quote",methods=["GET","POST"])
-def convert_quote():
-    form=QuoteForm()
-    if form.validate_on_submit():
-        convert_quote(form.quote_number.data)
-
-    return render_template("convert_quote.html",form=form)
 
 
 
@@ -202,19 +195,37 @@ def teacher_login():
     
     return render_template("teacher_login.html",form=form)
 
-@app.route("/quotes",methods=["POST"])
+@app.route("/convert_quote",methods=["POST", "GET"])
 def quote_list():
-    data=request.json
-    student_email=data['student_email']
-    student_name=data["student_name"]
-    try:
-        student=Student.query.filter(Student.email==student_email,Student.name==student_name).first()
-        quote=stripe.Quote.retrieve(student.active_quote_id)
-        if student is None:
-            raise Exception
-        return jsonify(quote=quote)
-    except Exception as e:
-        return jsonify(error='Hmm, there was an issue with your request')
+    form=QuoteForm()
+    if form.validate_on_submit():
+
+        data=request.form
+        student_email=data["student_email"]
+        student_name=data["student_name"]
+        try:
+            student=Student.query.filter(Student.email==student_email,Student.name==student_name).first()
+            quote=stripe.Quote.retrieve(student.active_quote_id,
+            stripe_account="acct_1KTzulDEIfAFUi70"
+            )
+            ''' TODO transfer account data to Quote modify function '''
+            session["quote_id"]=quote["id"]
+            session["account_id"]=student.teacher[0].account_id
+            if student is None:
+                raise Exception
+            return render_template("convert_quote.html",form=form,quote=quote,student=student)
+        except Exception as e:
+            return jsonify(error='Hmm, there was an issue with your request')
+    return render_template("convert_quote.html",form=form)
+
+@app.route("/handle_quote",methods=["post","get"])
+def handle_quote():
+   resp=stripe.Quote.accept(session["quote_id"],
+   stripe_account=session["account_id"]
+   )
+   flash("Quote Converted","success")
+   return redirect("/convert_quote")
+    
 @app.route("/teacher/<account_id>/profile",methods=["GET","POST"])
 def teacher_profile(account_id):
     if "curr_user" not in session:
