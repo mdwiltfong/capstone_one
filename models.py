@@ -219,6 +219,7 @@ class Student(db.Model):
                 "price": price["id"],"quantity":1
             }],
             collection_method="send_invoice",
+            application_fee_percent=10,
             invoice_settings={
                 "days_until_due":2
             },
