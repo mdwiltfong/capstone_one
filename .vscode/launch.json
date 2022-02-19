@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "flask run --port=4242",
+      "name": "flask run",
       "type": "python",
       "request": "launch",
       "module": "flask",

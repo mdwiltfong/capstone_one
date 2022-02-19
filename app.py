@@ -1,12 +1,13 @@
 
+from email.quoprimime import quote
 import os
 import pdb
-from flask import Flask, render_template, flash, redirect, session, jsonify,request
+from flask import Flask, render_template, flash, redirect, session, jsonify,request,send_file
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db
-from forms import AddCustomer,PaymentDetails,StudentLogin, SubscriptionPlan,TeacherInvoice
-from helper_functions import invoice_price
+from forms import AddCustomer,StudentLogin, SubscriptionPlan,TeacherInvoice,QuoteForm
+from helper_functions import convert_quote
 import stripe
 import json
 
@@ -97,18 +98,16 @@ def add_teacher():
     form=AddCustomer()
     if form.validate_on_submit():
         try:
-            new_teacher=Teacher.signup(
+            new_teacher_acct=Teacher.signup(
                 username=form.username.data,
                 email=form.email.data,
                 password=form.password.data
             )
 
-            db.session.commit()
-
-            session["curr_user"]=new_teacher.stripe_id
+            session["curr_user"]=new_teacher_acct["new_account"]["id"]
             session["teacher"]=True
 
-            return redirect('/teacher/plan/prices')
+            return redirect(new_teacher_acct["acc_link"]["url"])
         except IntegrityError as err:
             db.session.rollback()
             existing = Teacher.query.filter_by(email=form.email.data).first()
@@ -117,6 +116,10 @@ def add_teacher():
 
     return render_template('add_teacher.html',form=form)
 
+@app.route('/teacher/signup/success',methods=["GET"])
+def successful_onboard():
+    flash("Successful Onboarding","success")
+    return redirect("/")
 
 @app.route("/teacher/plan/prices",methods=["GET","POST"])
 def create_checkout_session():
@@ -150,17 +153,24 @@ def teacher_invoice():
     if "curr_user" not in session:
         flash("You need to be logged in","danger")
         return redirect("/")
-    teacher=Teacher.query.filter_by(stripe_id=session["curr_user"]).first()
+    teacher=Teacher.query.filter_by(account_id=session["curr_user"]).first()
     if form.validate_on_submit():
         new_student=Student.signup(form,teacher)
-        resp= Student.create_subscription(new_student.stripe_id,form)
-        if resp.get("error",False):
+        quote=Student.create_quote(new_student,form,session["curr_user"])
+        #resp= Student.create_subscription(new_student.stripe_id,form,session["curr_user"])
+        if quote.get("error",False):
             flash("There was an issue making the Invoice","danger")
-            return redirect(f'/teacher/{teacher.stripe_id}/profile')
+            return redirect(f'/teacher/{teacher.account_id}/profile')
 
-        flash("Invoice Sent","success")
-        return redirect(f'/teacher/{teacher.stripe_id}/profile')
+        #flash("Invoice Sent","success")
+        #return redirect(f'/teacher/{teacher.account_id}/profile')
+        return redirect("/teacher/quote/download")
     return render_template("invoice_form.html",form=form,teacher=teacher)
+
+@app.route("/teacher/quote/download")
+def teacher_quote():
+    return send_file("tmp.pdf")
+
 
 
 
@@ -174,8 +184,8 @@ def teacher_login():
         username=form.username.data
         teacher=Teacher.authentication(username,password)
         if teacher:
-            session["curr_user"]=teacher.stripe_id
-            session["subscription_status"]=teacher.subscription_status
+            session["curr_user"]=teacher.account_id
+            session["subscription_status"]=teacher.account_status
             session["teacher"]=True
             flash("You've logged in!","success")
             return redirect("/")
@@ -185,14 +195,45 @@ def teacher_login():
     
     return render_template("teacher_login.html",form=form)
 
-@app.route("/teacher/<stripe_id>/profile",methods=["GET","POST"])
-def teacher_profile(stripe_id):
+@app.route("/convert_quote",methods=["POST", "GET"])
+def quote_list():
+    form=QuoteForm()
+    if form.validate_on_submit():
+
+        data=request.form
+        student_email=data["student_email"]
+        student_name=data["student_name"]
+        try:
+            student=Student.query.filter(Student.email==student_email,Student.name==student_name).first()
+            quote=stripe.Quote.retrieve(student.active_quote_id,
+            stripe_account="acct_1KTzulDEIfAFUi70"
+            )
+            
+            session["quote_id"]=quote["id"]
+            session["account_id"]=student.teacher[0].account_id
+            if student is None:
+                raise Exception
+            return render_template("convert_quote.html",form=form,quote=quote,student=student)
+        except Exception as e:
+            return jsonify(error='Hmm, there was an issue with your request')
+    return render_template("convert_quote.html",form=form)
+
+@app.route("/handle_quote",methods=["post","get"])
+def handle_quote():
+    #TODO We are creating subscriptions and quotes on the connected account. We should gather customer payment info for charging them later. 
+   resp=stripe.Quote.accept(session["quote_id"],
+   stripe_account=session["account_id"]
+   )
+   flash("Quote Converted","success")
+   return redirect("/convert_quote")
+    
+@app.route("/teacher/<account_id>/profile",methods=["GET","POST"])
+def teacher_profile(account_id):
     if "curr_user" not in session:
         flash("You need to be logged in.", "danger")
         return redirect("/")
     
-    teacher=Teacher.query.filter_by(stripe_id=stripe_id).first()
-    teacher.username
+    teacher=Teacher.query.filter_by(account_id=account_id).first()
     return render_template("teacher_profile.html",teacher=teacher)
 
 

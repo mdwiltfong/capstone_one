@@ -1,6 +1,7 @@
+from itertools import product
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-from flask import jsonify
+from flask import jsonify,send_file
 import stripe
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -29,22 +30,12 @@ class Teacher(db.Model):
         primary_key=True
     )
 
-    plan=db.Column(
-       db.Text,
-        nullable=True
-
-    )
     
-    subscription_status=db.Column(
+    account_status=db.Column(
         db.Text,
         nullable=True
     )
-    subscription_id=db.Column(
-        db.Text,
-        nullable=True
-    )
-
-    stripe_id=db.Column(
+    account_id=db.Column(
         db.Text,
         nullable=True
     )
@@ -83,17 +74,35 @@ class Teacher(db.Model):
             email=email,
             password=hashed_pwd          
         )
-        customer=stripe.Customer.create(
-                email=new_teacher.email,
-                metadata={
-                    "username": new_teacher.username,
-                    "db_id":new_teacher.id,
-                    "customer_type":"teacher"
-                }
-            )
-        new_teacher.stripe_id=customer.id
+        new_account=stripe.Account.create(
+            type="express",
+            country="US",
+            email=email,
+            capabilities={
+                "card_payments":{"requested":True},
+                "transfers":{"requested":True}
+            },
+            business_type="individual",            
+        )
+
+        ## TODO #41 We will need to change the Teacher model to handle this new onboarding
+        acc_link=stripe.AccountLink.create(
+            account=new_account["id"],
+            refresh_url="http://127.0.0.1:5000/teacher/signup",
+            return_url="http://127.0.0.1:5000/teacher/signup/success",
+            type="account_onboarding"
+        )
+
+        new_teacher.account_status='restricted'
+        new_teacher.account_id=new_account["id"]
         db.session.add(new_teacher)
-        return new_teacher
+        db.session.commit()
+
+        return {
+            "new_teacher":new_teacher,
+            "new_account":new_account,
+            "acc_link":acc_link
+        }
     @classmethod
     def create_subscription(cls,customer_id,price):      
         try:
@@ -116,8 +125,8 @@ class Teacher(db.Model):
             teacher=Teacher.query.filter_by(username=username).first()
             if teacher:
                 is_auth = bcrypt.check_password_hash(teacher.password, password)
-                subscription_status=teacher.subscription_status
-                if is_auth and subscription_status=="active":
+                account_status=teacher.account_status
+                if is_auth and account_status=="complete":
                     return teacher
             return False
     @classmethod
@@ -143,6 +152,10 @@ class Student(db.Model):
         nullable=True
     )
     subscription_id=db.Column(
+        db.Text,
+        nullable=True
+    )
+    active_quote_id=db.Column(
         db.Text,
         nullable=True
     )
@@ -188,7 +201,8 @@ class Student(db.Model):
                     "username": new_student.username,
                     "db_id":new_student.id,
                     "customer_type":"student"
-                }
+                },
+                stripe_account=teacher.account_id
             )
         new_student.stripe_id=customer.id
         new_student.teacher.append(teacher)
@@ -196,9 +210,39 @@ class Student(db.Model):
         db.session.commit()
         return new_student
 
-
     @classmethod
-    def create_subscription(cls,customer_id,form):      
+    def create_quote(cls,student,form,account_id):
+        price=create_product_stripe(account_id,form)
+        quote=stripe.Quote.create(
+            customer=student.stripe_id,
+            line_items=[{
+                "price": price["id"],"quantity":1
+            }],
+            collection_method="send_invoice",
+            application_fee_percent=10,
+            invoice_settings={
+                "days_until_due":2
+            },
+            stripe_account=account_id
+        )
+
+        student.active_quote_id=quote["id"]
+        db.session.add(student)
+        db.session.commit()
+        quote=stripe.Quote.finalize_quote(
+            quote["id"],
+            stripe_account=account_id
+            )
+        resp=stripe.Quote.pdf(quote["id"],
+        stripe_account=account_id
+        )
+        file=open("tmp.pdf","wb")
+        file.write(resp.io.read())
+        file.close()
+    
+        return quote
+    @classmethod
+    def create_subscription(cls,customer_id,form,account_id):      
         try:
 
             ## TODO For some reason the subscriptions are created as 'active' despite having an open invoice. 
@@ -208,10 +252,11 @@ class Student(db.Model):
                 items=[{
                     'price': price["id"]
                 }],
-                payment_behavior='default_incomplete',
                 collection_method="send_invoice",
-                days_until_due=2,
-                expand=['latest_invoice.payment_intent']
+                days_until_due=1,
+                expand=['latest_invoice.payment_intent'],
+                application_fee_percent=10,
+                stripe_account=account_id
             )
 
 

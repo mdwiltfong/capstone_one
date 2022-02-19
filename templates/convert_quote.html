@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}
+Invoice
+{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h1 class="display-1 text-center">Convert a Quote into a Subscription</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            {% for category, msg in get_flashed_messages(with_categories=true) %}
+            <div class="container d-flex justify-content-center">
+                <p class="w-25 alert alert-{{category}}">{{msg}}</p>
+            </div>
+            {% endfor %}
+            <form action="" method="post">
+                {{form.hidden_tag()}}
+                {% for field in form
+                if field.widget.input_type !='hidden' %}
+                <div class="form-group">
+                    {{field.label }}
+                    {{field(class_="form-control")}}
+                    {% for err in field.errors %}
+                    <small class="form-text text-danger">
+                        {{err}}
+
+                    </small>
+                    {% endfor %}
+                </div>
+
+                {% endfor %}
+                <button type="submit" class="btn btn-success btn-lg">Submit</button>
+                <button type="submit" formaction="/" class="btn btn-danger btn-lg">Cancel</button>
+            </form>
+        </div>
+
+        {% if quote and student %}
+        <div class="container" id="quote_list" style="min-height: 500px;">
+            <form action="/handle_quote" method="GET" class="card">
+                <div class="card-header">
+                    {{student.name}}
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li class="list-group-item">{{quote["number"]}}</li>
+                        <li class="list-group-item">Total: {{quote["amount_total"]/100}} {{quote["currency"].upper()}}
+                            per
+                            {{quote["computed"]["recurring"]["interval"]}} </li>
+
+                    </ul>
+                    <button class="btn btn-primary">Subscribe</button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock content %}
