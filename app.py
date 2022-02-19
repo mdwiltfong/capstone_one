@@ -208,7 +208,7 @@ def quote_list():
             quote=stripe.Quote.retrieve(student.active_quote_id,
             stripe_account="acct_1KTzulDEIfAFUi70"
             )
-            ''' TODO transfer account data to Quote modify function '''
+            
             session["quote_id"]=quote["id"]
             session["account_id"]=student.teacher[0].account_id
             if student is None:
@@ -220,6 +220,7 @@ def quote_list():
 
 @app.route("/handle_quote",methods=["post","get"])
 def handle_quote():
+    #TODO We are creating subscriptions and quotes on the connected account. We should gather customer payment info for charging them later. 
    resp=stripe.Quote.accept(session["quote_id"],
    stripe_account=session["account_id"]
    )
