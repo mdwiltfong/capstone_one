@@ -20,9 +20,9 @@
 
   <!--Stripe-->
   <script src="https://js.stripe.com/v3/"></script>
-  {% block stylesheet %} 
+  {% block stylesheet %}
   <link rel="stylesheet" href="../static/style.css">
-  
+
   {% endblock stylesheet %}
   <title>{% block title %} {% endblock title %}</title>
   <script src="https://kit.fontawesome.com/c18557e782.js" crossorigin="anonymous"></script>
@@ -30,29 +30,31 @@
 
 <body style="height:100%">
   <nav class="navbar navbar-expand px-3" style="background-color:#7A73FF;">
-    <a  style="color:white; font-size: 20px;" class="navbar-brand" href="/">Home</a>
+    <a style="color:white; font-size: 20px;" class="navbar-brand" href="/">Home</a>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <!-- @AndreaDubuc the jinja template below is an if statement.
                     If a user is logged in, they'll see a logout option. If not, they'll see a login option -->
         {% if "curr_user" in session %}
-        <li class="nav-item" >
+        <li class="nav-item">
           <a style="color:white; font-size: 20px;" class="nav-link" href="/logout">Logout</a>
         </li>
         {% if "teacher" in session %}
         <li class="nav-item">
-          <a href="/teacher/{{session['curr_user']}}/profile" class="nav-link">Profile Page</a>
+          <a href="/teacher/{{session['curr_user']}}/profile" class="nav-link"
+            style="color:white; font-size: 20px;">Profile Page</a>
         </li>
         {% endif %} {% else %}
         <li class="nav-item active">
-          <a  style="color:white; font-size: 20px;" class="nav-link" href="/signup">Signup <span class="sr-only"></span></a>
+          <a style="color:white; font-size: 20px;" class="nav-link" href="/signup">Signup <span
+              class="sr-only"></span></a>
         </li>
         <li class="nav-item">
           <a style="color:white; font-size: 20px;" class="nav-link" href="/">Login</a>
         </li>
         {% endif %}
         <li class="nav-item">
-          <a href="/convert_quote" class="nav-link">Convert Quote</a>
+          <a href="/convert_quote" class="nav-link" style="color:white; font-size: 20px;">Convert Quote</a>
         </li>
       </ul>
     </div>
