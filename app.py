@@ -101,7 +101,8 @@ def add_teacher():
             new_teacher_acct=Teacher.signup(
                 username=form.username.data,
                 email=form.email.data,
-                password=form.password.data
+                password=form.password.data,
+                photo_url=form.photo_url.data
             )
 
             session["curr_user"]=new_teacher_acct["new_account"]["id"]
