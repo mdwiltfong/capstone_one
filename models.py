@@ -57,6 +57,21 @@ class Teacher(db.Model):
         nullable=False,
     )
 
+    photo_url=db.Column(
+        db.Text,
+        default="https://media.istockphoto.com/photos/businesswoman-icon-picture-id501338715"
+    )
+    
+    city=db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    state=db.Column(
+        db.Text,
+        nullable=False
+    )
+
     def __repr__(self):
         return f"<Teacher #{self.id}: {self.username}, {self.email}>"
     

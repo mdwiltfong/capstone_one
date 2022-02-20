@@ -14,9 +14,8 @@
     <div class="container d-flex flex-row justify-content-center">
 
         <div class="teacher-details column /*border border-danger */">
-            <div class="container row" style="height:200px; width: 200px;">
-                <img src="https://images.unsplash.com/photo-1548449112-96a38a643324?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"
-                    class="img-thumbnail" alt="">
+            <div class="container row" style="height:200px; width: auto;">
+                <img style="max-width: 200px; height:auto" src="{{teacher.photo_url}}" class="img-thumbnail" alt="">
             </div>
             <div class="teacher-info row d-flex flex-column">
                 <p>
@@ -41,6 +40,7 @@
                 <hr
                     style="height:2px; width:100%; border-width:0; color:rgb(107, 107, 107); background-color:rgb(107, 107, 107) ; padding-left: 12px;" />
                 {% if teacher.students %}
+                <h6>Send another <a href="/teacher/invoice">quote</a></h6>
                 <ul>
                     {% for student in teacher.students %}
                     <li><a href="/student/{{student.is}}/profile">{{student.name}}</a></li>

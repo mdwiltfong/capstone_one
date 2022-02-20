@@ -2,7 +2,7 @@ from ssl import create_default_context
 from unicodedata import name
 from flask_wtf import FlaskForm
 from wtforms import StringField,SelectField, PasswordField, DateField,RadioField, DecimalField,DateField
-from wtforms.validators import InputRequired, Email, Optional,Length
+from wtforms.validators import InputRequired, Email, Optional,Length,url
 from countries import US_STATES,months
 from helper_functions import dict_to_list
 
@@ -10,6 +10,7 @@ class AddCustomer(FlaskForm):
     email=StringField("Email", validators=[InputRequired(),Email()])
     username=StringField("Username", validators=[InputRequired()])
     password=PasswordField("Password",validators=[InputRequired(), Length(min=6,message="Password need to be 6 characters in length")])
+    photo_url=StringField('Profile Picture',validators=[Optional(),url(message="This is not a valid URL")])
     
 class PaymentDetails(FlaskForm):    
     name=StringField("Name (as it appears on your card)",validators=[InputRequired()])
