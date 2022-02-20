@@ -1,4 +1,5 @@
 from ssl import create_default_context
+from tokenize import String
 from unicodedata import name
 from flask_wtf import FlaskForm
 from wtforms import StringField,SelectField, PasswordField, DateField,RadioField, DecimalField,DateField
@@ -11,6 +12,8 @@ class AddCustomer(FlaskForm):
     username=StringField("Username", validators=[InputRequired()])
     password=PasswordField("Password",validators=[InputRequired(), Length(min=6,message="Password need to be 6 characters in length")])
     photo_url=StringField('Profile Picture',validators=[Optional(),url(message="This is not a valid URL")])
+    city=StringField("City", validators=[InputRequired()])
+    state=StringField("State", validators=[InputRequired()])
     
 class PaymentDetails(FlaskForm):    
     name=StringField("Name (as it appears on your card)",validators=[InputRequired()])
