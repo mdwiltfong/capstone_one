@@ -12,13 +12,28 @@ Homepage
     <p class="w-25 alert alert-{{category}}">{{msg}}</p>
 </div>
 {% endfor %}
+
+
 <div class="container d-flex p-0">
     <img src="../static/assets/Home_Page_Image.jpg" alt="Pink shirt girl in front of laptop smiling">
+   
     <span class="d-flex flex-column content justify-content-center align-items-center">
-        <h1 class="">WELCOME</h1>
+
+       
+    {% if "curr_user" in session %}
+        <h1 class="">Oh, It's you again</h1>
         <span class="d-flex justify-content-around w-25">
             <a href="/teacher/signup" class="btn btn-primary">Sign up</a>
         </span>
+    {% else %}
+         
+         <h1 class="">WELCOME</h1>
+        <span class="d-flex justify-content-around w-25">
+            <a href="/teacher/signup" class="btn btn-primary">Sign up</a>
+        </span>
+    {% endif %}
+
+        
     </span>
 </div>
 {% endblock content %}
