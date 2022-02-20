@@ -279,4 +279,21 @@ def webhook_received():
         db.session.add(teacher)
         db.session.commit()
 
+
+    if event_type=="account.updated":
+        #during onboarding the account status of the teacher will be `restricted`, until the webhook confirms all details are submited
+        try:
+            teacher=Teacher.query.filter(Teacher.account_id == data_object["id"], Teacher.account_status != 'complete').first()
+            if teacher is None:
+                raise Exception("Teacher status is already complete")
+            if data_object["details_submitted"]:
+                teacher.account_status="complete"
+                db.session.add(teacher)
+                db.session.commit()
+        except Exception as e:
+            print(e)
+        
+
+
+
     return jsonify({'status': 'success'})
