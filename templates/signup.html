@@ -2,10 +2,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 
 <!--Animate.css-->
-    <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-  />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
 {% endblock stylesheet %} {% block title %} Homepage {% endblock title %} {%
 block content %} {% for category, msg in
@@ -16,18 +13,12 @@ get_flashed_messages(with_categories=true) %}
 </div>
 {% endfor %}
 <div class="container d-flex p-0">
-  <img
-    src="../static/assets/Home_Page_Image.jpg"
-    alt="Pink shirt girl in front of laptop smiling"
-  />
-  <span
-    class="d-flex flex-column content justify-content-center align-items-center"
-  >
+  <img src="../static/assets/Home_Page_Image.jpg" alt="Pink shirt girl in front of laptop smiling" />
+  <span class="d-flex flex-column content justify-content-center align-items-center">
     <h1 class="animate__animated animate__bounce" class="">WELCOME</h1>
     <span class="d-flex justify-content-around w-25">
-      <a href="/teacher/login" class="btn btn-primary">Sign up</a>
+      <a href="/teacher/signup" class="btn btn-primary">Sign up</a>
     </span>
   </span>
 </div>
 {% endblock content %}
- 
