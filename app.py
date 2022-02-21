@@ -37,7 +37,9 @@ def homepage():
 def signup():
     return render_template("signup.html")
 
-
+@app.route("/about")
+def load_about():
+    return render_template("about.html")
 @app.route('/logout')
 def logout():
     if "curr_user" in session:
