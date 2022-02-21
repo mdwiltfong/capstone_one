@@ -9,7 +9,7 @@ block stylesheet %}
 {% endblock script %} {% block content %}
 <!-- Display a payment form -->
 <div class="container">
-  <form id="payment-form">
+  <form id="payment-form" data-secret="{{clientSecret}}">
     <fieldset>
       <div class="row">
         <label for="name">Name</label>
@@ -19,37 +19,13 @@ block stylesheet %}
         <label for="phone">Phone</label>
         <input type="text" name="" id="phone" required autocomplete="phone" />
         <label for="address">Address</label>
-        <input
-          type="text"
-          name=""
-          id="address"
-          required
-          autocomplete="address"
-        />
+        <input type="text" name="" id="address" required autocomplete="address" />
         <label for="city">City</label>
-        <input
-          type="text"
-          name=""
-          id="city"
-          required
-          autocomplete="address-level2"
-        />
+        <input type="text" name="" id="city" required autocomplete="address-level2" />
         <label for="state">State</label>
-        <input
-          type="text"
-          name=""
-          id="state"
-          required
-          autocomplete="address-level1"
-        />
+        <input type="text" name="" id="state" required autocomplete="address-level1" />
         <label for="zip">Zip</label>
-        <input
-          type="text"
-          name=""
-          id="zip"
-          required
-          autocomplete="postal-code"
-        />
+        <input type="text" name="" id="zip" required autocomplete="postal-code" />
       </div>
     </fieldset>
     <div id="payment-element">
