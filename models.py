@@ -1,4 +1,3 @@
-from itertools import product
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask import jsonify,send_file
@@ -308,7 +307,7 @@ class Invoice(db.Model):
         autoincrement=True,
         primary_key=True
     )
-    
+
     teacher_id=db.Column(db.Integer,
                         db.ForeignKey("teachers.id", ondelete="cascade"),        
             )
