@@ -20,5 +20,9 @@ h1{
   border-color: #7A73FF;
   font-size: 22px;
 }
+svg {
+  height: 20px;
+  width: 25px;
+}
 
   
