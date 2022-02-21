@@ -263,22 +263,14 @@ def webhook_received():
     data_object = data['object']
 
     if event_type == "customer.subscription.created":
-        customer=Teacher.query.filter_by(stripe_id=data_object["customer"]).first()
-        if customer:
-            Teacher.handle_subscription_created(customer.stripe_id,data_object)
-        else:
-            customer=Student.query.filter_by(stripe_id=data_object["customer"]).first()
-            Student.handle_subscription_created(customer.stripe_id,data_object)
+        customer=Student.query.filter_by(stripe_id=data_object["customer"]).first()
+        Student.handle_subscription_created(customer.stripe_id,data_object)
         
         
 
     if event_type=="customer.subscription.updated":
-        subscription_status=data_object["status"]
-        customer_id=data_object["customer"]
-        teacher=Teacher.query.filter_by(stripe_id=customer_id).first()
-        teacher.subscription_status=subscription_status
-        db.session.add(teacher)
-        db.session.commit()
+        #Webhook listens for subscriptions that become past_due
+        print(data_object)
 
 
     if event_type=="account.updated":
@@ -293,7 +285,8 @@ def webhook_received():
                 db.session.commit()
         except Exception as e:
             print(e)
-        
+    
+
 
 
 
