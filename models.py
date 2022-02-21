@@ -59,7 +59,7 @@ class Teacher(db.Model):
 
     photo_url=db.Column(
         db.Text,
-        default="https://media.istockphoto.com/photos/businesswoman-icon-picture-id501338715"
+        default=None
     )
     
     city=db.Column(

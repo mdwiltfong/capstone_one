@@ -15,7 +15,16 @@
 
         <div class="teacher-details column /*border border-danger */">
             <div class="container row" style="height:200px; width: auto;">
+                {% if teacher.photo_url == None %}
+                <img style="max-width: 200px; height:auto"
+                    src="{{ url_for('static', filename='assets/default_profile_pic.png') }}" class="img-thumbnail"
+                    alt="">
+
+                {% else %}
                 <img style="max-width: 200px; height:auto" src="{{teacher.photo_url}}" class="img-thumbnail" alt="">
+
+                {% endif %}
+
             </div>
             <div class="teacher-info row d-flex flex-column">
                 <p>
