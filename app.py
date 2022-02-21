@@ -119,9 +119,6 @@ def add_teacher():
 
     return render_template('add_teacher.html',form=form)
 
-
-
-
 ######Invoices Created By Teachers#############
 
 @app.route("/teacher/invoice",methods=["GET","POST"])
