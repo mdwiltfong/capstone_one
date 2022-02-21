@@ -121,11 +121,6 @@ def add_teacher():
 
 
 
-@app.route("/create-payment-intent",methods=["GET","POST"])
-def create_payment_intent():
-    return jsonify(client_secret=session["client_secret"])
-
-
 
 ######Invoices Created By Teachers#############
 
@@ -221,8 +216,8 @@ def config_details():
     return jsonify(client_secret=session["client_secret"],account_id=session["account_id"])
 @app.route("/checkout_successful",methods=["GET","POST"])
 def checkout():
-    flash("Payment Details Saved","success")
-    return render_template('checkout.html')
+    flash("Payment Successful","success")
+    return redirect("/")
 
 @app.route("/teacher/<account_id>/profile",methods=["GET","POST"])
 def teacher_profile(account_id):
