@@ -267,6 +267,8 @@ def webhook_received():
         db.session.add(student)
         db.session.commit()
 
+        return jsonify(student_id=student.stripe_id,subscription_status=student.subscription_status), 200
+
 
     if event_type=="account.updated":
         #during onboarding the account status of the teacher will be `restricted`, until the webhook confirms all details are submited
@@ -281,8 +283,4 @@ def webhook_received():
         except Exception as e:
             print(e)
     
-
-
-
-
     return jsonify({'status': 'success'})
