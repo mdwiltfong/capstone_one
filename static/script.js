@@ -55,6 +55,7 @@ form.addEventListener("submit", async (e) => {
           phone: phoneInput.value,
         },
       },
+      setup_future_usage: "off_session",
     })
     .then((result) => {
       if (result.error) {
@@ -63,7 +64,7 @@ form.addEventListener("submit", async (e) => {
         // Redirect the customer to their account page
         console.log("--->", result);
         setMessage("Success! Redirecting to your account.");
-        window.location.href = "/teacher/plan/prices/success";
+        window.location.href = "/checkout_successful";
       }
     });
 });
