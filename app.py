@@ -265,14 +265,18 @@ def webhook_received():
     data_object = data['object']
 
     if event_type == "customer.subscription.created":
-        customer=Student.query.filter_by(stripe_id=data_object["customer"]).first()
-        Student.handle_subscription_created(customer.stripe_id,data_object)
+        #webhook updates student subscription information and status to active
+        student=Student.query.filter_by(stripe_id=data_object["customer"]).first()
+        Student.handle_subscription_created(student.stripe_id,data_object)
         
-        
+        return jsonify({"status":'success'}), 200
 
     if event_type=="customer.subscription.updated":
         #Webhook listens for subscriptions that become past_due
-        print(data_object)
+        student=Student.query.filter(Student.subscription_id==data_object["id"]).first()
+        student.subscription_status=data_object["status"]
+        db.session.add(student)
+        db.session.commit()
 
 
     if event_type=="account.updated":
