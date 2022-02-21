@@ -119,26 +119,6 @@ def add_teacher():
 
     return render_template('add_teacher.html',form=form)
 
-@app.route('/teacher/signup/success',methods=["GET"])
-def successful_onboard():
-    flash("Successful Onboarding","success")
-    return redirect("/")
-
-@app.route("/teacher/plan/prices",methods=["GET","POST"])
-def create_checkout_session():
-    form=SubscriptionPlan()
-
-    if form.validate_on_submit():
-        price=stripe.Price.retrieve(form.plan.data)
-        subscription=Teacher.create_subscription(session["curr_user"],price)
-        session["client_secret"]=subscription["clientSecret"]
-        return redirect("/checkout")
-    return render_template('subscription_list.html',form=form)
-
-@app.route("/create-payment-intent",methods=["GET","POST"])
-def create_payment_intent():
-    return jsonify(client_secret=session["client_secret"])
-
 
 @app.route("/checkout",methods=["GET","POST"])
 def checkout():
