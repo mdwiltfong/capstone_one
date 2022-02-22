@@ -1,11 +1,11 @@
 
-from email.quoprimime import quote
+
 import os
 import pdb
 from flask import Flask, render_template, flash, redirect, session, jsonify,request,send_file
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-from models import Teacher, Student,db,connect_db
+from models import Teacher, Student,db,connect_db,Quote
 from forms import AddCustomer,StudentLogin, SubscriptionPlan,TeacherInvoice,QuoteForm
 from helper_functions import convert_quote
 import stripe
@@ -278,6 +278,16 @@ def webhook_received():
                 db.session.add(teacher)
                 db.session.commit()
         except Exception as e:
-            print(e)
-    
+            return e
+    if event_type =="quote.finalized" or "quote.accepted":
+        try:
+            quote=Quote.query.filter(Quote.stripeid == data_object["id"]).first()
+            if quote is None:
+                raise Exception("Quote not found")
+            quote.quote_status=data_object["status"]
+            db.session.add(quote)
+            db.session.commit()
+        except Exception as e:
+            return e
+
     return jsonify({'status': 'success'})
