@@ -52,7 +52,18 @@
                 <h6>Send another <a href="/teacher/invoice">quote</a></h6>
                 <ul>
                     {% for student in teacher.students %}
-                    <li><a href="/student/{{student.is}}/profile">{{student.name}}</a></li>
+                    {% if student.quote %}
+                    <li><a href="/student/{{student.is}}/profile">{{student.name}}</a> -
+                        <div class="badge alert-secondary d-inline">Quote Status : {{student.quote[0].quote_status}}
+                        </div>
+                    </li>
+                    {% else %}
+                    <li><a href="/student/{{student.is}}/profile">{{student.name}}</a> - <div
+                            class="badge alert-primary d-inline">Enrollment:
+                            {{student.subscription_status}}</div>
+                    </li>
+
+                    {% endif %}
                     {% endfor %}
                 </ul>
 
