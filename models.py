@@ -1,4 +1,3 @@
-from itertools import product
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask import jsonify,send_file
@@ -59,7 +58,7 @@ class Teacher(db.Model):
 
     photo_url=db.Column(
         db.Text,
-        default="https://media.istockphoto.com/photos/businesswoman-icon-picture-id501338715"
+        default=None
     )
     
     city=db.Column(
@@ -233,11 +232,7 @@ class Student(db.Model):
             line_items=[{
                 "price": price["id"],"quantity":1
             }],
-            collection_method="send_invoice",
             application_fee_percent=10,
-            invoice_settings={
-                "days_until_due":2
-            },
             stripe_account=account_id
         )
 
@@ -312,7 +307,7 @@ class Invoice(db.Model):
         autoincrement=True,
         primary_key=True
     )
-    
+
     teacher_id=db.Column(db.Integer,
                         db.ForeignKey("teachers.id", ondelete="cascade"),        
             )

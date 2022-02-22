@@ -119,35 +119,6 @@ def add_teacher():
 
     return render_template('add_teacher.html',form=form)
 
-@app.route('/teacher/signup/success',methods=["GET"])
-def successful_onboard():
-    flash("Successful Onboarding","success")
-    return redirect("/")
-
-@app.route("/teacher/plan/prices",methods=["GET","POST"])
-def create_checkout_session():
-    form=SubscriptionPlan()
-
-    if form.validate_on_submit():
-        price=stripe.Price.retrieve(form.plan.data)
-        subscription=Teacher.create_subscription(session["curr_user"],price)
-        session["client_secret"]=subscription["clientSecret"]
-        return redirect("/checkout")
-    return render_template('subscription_list.html',form=form)
-
-@app.route("/create-payment-intent",methods=["GET","POST"])
-def create_payment_intent():
-    return jsonify(client_secret=session["client_secret"])
-
-
-@app.route("/checkout",methods=["GET","POST"])
-def checkout():
-    return render_template('checkout.html')
-@app.route("/teacher/plan/prices/success",methods=["GET","POST"])
-def success_page():
-    flash("Payment Succeeded!","success")
-    return redirect("/")
-
 ######Invoices Created By Teachers#############
 
 @app.route("/teacher/invoice",methods=["GET","POST"])
@@ -209,9 +180,8 @@ def quote_list():
         try:
             student=Student.query.filter(Student.email==student_email,Student.name==student_name).first()
             quote=stripe.Quote.retrieve(student.active_quote_id,
-            stripe_account="acct_1KTzulDEIfAFUi70"
-            )
-            
+            stripe_account=student.teacher[0].account_id
+            )            
             session["quote_id"]=quote["id"]
             session["account_id"]=student.teacher[0].account_id
             if student is None:
@@ -225,11 +195,27 @@ def quote_list():
 def handle_quote():
     #TODO We are creating subscriptions and quotes on the connected account. We should gather customer payment info for charging them later. 
    resp=stripe.Quote.accept(session["quote_id"],
-   stripe_account=session["account_id"]
+   stripe_account=session["account_id"]   
    )
-   flash("Quote Converted","success")
-   return redirect("/convert_quote")
-    
+   invoice=stripe.Invoice.finalize_invoice(resp["invoice"],
+   stripe_account=session["account_id"],
+    expand=["payment_intent"]
+   )
+   session["client_secret"]=invoice["payment_intent"]["client_secret"]
+   return redirect("/checkout")
+
+@app.route("/checkout",methods=["POST","GET"])
+def handle_checkout():
+    return render_template("checkout.html",clientSecret=session["client_secret"])
+
+@app.route("/config",methods=["GET"])
+def config_details():
+    return jsonify(client_secret=session["client_secret"],account_id=session["account_id"])
+@app.route("/checkout_successful",methods=["GET","POST"])
+def checkout():
+    flash("Payment Successful","success")
+    return redirect("/")
+
 @app.route("/teacher/<account_id>/profile",methods=["GET","POST"])
 def teacher_profile(account_id):
     if "curr_user" not in session:
@@ -265,22 +251,20 @@ def webhook_received():
     data_object = data['object']
 
     if event_type == "customer.subscription.created":
-        customer=Teacher.query.filter_by(stripe_id=data_object["customer"]).first()
-        if customer:
-            Teacher.handle_subscription_created(customer.stripe_id,data_object)
-        else:
-            customer=Student.query.filter_by(stripe_id=data_object["customer"]).first()
-            Student.handle_subscription_created(customer.stripe_id,data_object)
+        #webhook updates student subscription information and status to active
+        student=Student.query.filter_by(stripe_id=data_object["customer"]).first()
+        Student.handle_subscription_created(student.stripe_id,data_object)
         
-        
+        return jsonify({"status":'success'}), 200
 
     if event_type=="customer.subscription.updated":
-        subscription_status=data_object["status"]
-        customer_id=data_object["customer"]
-        teacher=Teacher.query.filter_by(stripe_id=customer_id).first()
-        teacher.subscription_status=subscription_status
-        db.session.add(teacher)
+        #Webhook listens for subscriptions that become past_due
+        student=Student.query.filter(Student.subscription_id==data_object["id"]).first()
+        student.subscription_status=data_object["status"]
+        db.session.add(student)
         db.session.commit()
+
+        return jsonify(student_id=student.stripe_id,subscription_status=student.subscription_status), 200
 
 
     if event_type=="account.updated":
@@ -295,8 +279,5 @@ def webhook_received():
                 db.session.commit()
         except Exception as e:
             print(e)
-        
-
-
-
+    
     return jsonify({'status': 'success'})

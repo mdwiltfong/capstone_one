@@ -14,17 +14,18 @@ Homepage
 {% endfor %}
 
 
-<div style="height:100%"class="container d-flex justify-content-center p-0">
-    
-    <span style="width:50%"class="d-flex flex-column content justify-content-center align-items-center">
-        
-        
+<div style="height:100%" class="container d-flex justify-content-center p-0">
+
+    <span style="width:50%" class="d-flex flex-column content justify-content-center align-items-center">
+
+
         {% if "curr_user" in session %}
         <h1 class="">Welcome</h1>
         <span class="d-flex justify-content-around w-25">
             <a href='/teacher/{{session["curr_user"]}}/profile' class="btn btn-primary">Dashboard</a>
         </span>
         {% else %}
+
         <div class="container">
         <h1 class="">Teacher Pay</h1>
         </div>
@@ -33,20 +34,20 @@ Homepage
         <p style="color: white;">
             Teacher Pay is an invoice app that saves you time, gets you paid, and makes managing students information stress-free. Start exploring all the app's features today.
 
+
             </p>
             <span class="w-25">
                 <a href="/teacher/signup" class="btn btn-primary">Sign up</a>
+
             </span> 
         </div>
             
-        
-        
-        
+
         {% endif %}
-        
-        
+
+
     </span>
     <!--Photo by Christina Morillo from Pexels  -->
-    <img src="../static/assets/Home_Page_Image.png" alt="Image of African-American man smiling">
+    <img src="../static/assets/Home_Page_Image.PNG" alt="Image of African-American man smiling">
 </div>
 {% endblock content %}

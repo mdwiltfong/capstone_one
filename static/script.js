@@ -1,33 +1,32 @@
-let stripe = Stripe(
-  "pk_test_51KMM12DBo40mpW7dSao4A4hiqc7G349eWgYu5racVc0xhtUJColbp4U7LJd8WqBx4fdEdxbbQTEmZruFB40oCso300XBtrIET5"
-);
-let client_secret, elements, cardElement;
+let stripe, clientSecret, elements, cardElement;
 
-async function getClientSecret() {
-  const resp = await fetch("/create-payment-intent", {
-    method: "GET",
+window.addEventListener("DOMContentLoaded", () => {
+  getConfig().then(() => {
+    const appearance = {
+      theme: "flat",
+    };
+
+    elements = stripe.elements({ clientSecret, appearance });
+    cardElement = elements.create("card");
+    cardElement.mount("#payment-element");
   });
-  const { client_secret } = await resp.json();
-  return client_secret;
+});
+
+async function getConfig() {
+  const details = await fetch("/config");
+  const { account_id, client_secret } = await details.json();
+  stripe = Stripe(
+    "pk_test_51KMM12DBo40mpW7dSao4A4hiqc7G349eWgYu5racVc0xhtUJColbp4U7LJd8WqBx4fdEdxbbQTEmZruFB40oCso300XBtrIET5",
+    { stripeAccount: account_id }
+  );
+  clientSecret = client_secret;
 }
 
-getClientSecret().then((resp) => {
-  console.log(resp);
-  const appearance = {
-    theme: "flat",
-  };
-  client_secret = resp;
-  elements = stripe.elements({ client_secret, appearance });
-  cardElement = elements.create("card");
-  cardElement.mount("#payment-element");
-});
-console.log(client_secret);
 // helper method for displaying a status message.
 const setMessage = (message) => {
   const messageDiv = document.querySelector("#messages");
   messageDiv.innerHTML += "<br>" + message;
 };
-
 const form = document.querySelector("#payment-form");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -41,7 +40,7 @@ form.addEventListener("submit", async (e) => {
   const zipInput = document.getElementById("zip");
   // Create payment method and confirm payment intent.
   stripe
-    .confirmCardPayment(client_secret, {
+    .confirmCardPayment(clientSecret, {
       payment_method: {
         card: cardElement,
         billing_details: {
@@ -56,6 +55,7 @@ form.addEventListener("submit", async (e) => {
           phone: phoneInput.value,
         },
       },
+      setup_future_usage: "off_session",
     })
     .then((result) => {
       if (result.error) {
@@ -64,7 +64,7 @@ form.addEventListener("submit", async (e) => {
         // Redirect the customer to their account page
         console.log("--->", result);
         setMessage("Success! Redirecting to your account.");
-        window.location.href = "/teacher/plan/prices/success";
+        window.location.href = "/checkout_successful";
       }
     });
 });
