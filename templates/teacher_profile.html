@@ -7,13 +7,13 @@
 
 <div class="container">
     {% for category, msg in get_flashed_messages(with_categories=true) %}
-    <div class="container d-flex justify-content-center">
+    <div class="container d-flex justify-content-center gap-3">
         <p class="w-25 alert alert-{{category}}">{{msg}}</p>
     </div>
     {% endfor %}
     <div class="container d-flex flex-row justify-content-center">
 
-        <div class="teacher-details column /*border border-danger */">
+        <div class="teacher-details column mx-3">
             <div class="container row" style="height:200px; width: auto;">
                 {% if teacher.photo_url == None %}
                 <img style="max-width: 200px; height:auto"
@@ -44,21 +44,21 @@
                             d="M168.3 499.2C116.1 435 0 279.4 0 192C0 85.96 85.96 0 192 0C298 0 384 85.96 384 192C384 279.4 267 435 215.7 499.2C203.4 514.5 180.6 514.5 168.3 499.2H168.3zM192 256C227.3 256 256 227.3 256 192C256 156.7 227.3 128 192 128C156.7 128 128 156.7 128 192C128 227.3 156.7 256 192 256z" />
                     </svg> {{teacher.city}},{{teacher.state}}</h6>
             </div>
-            <div class="row d-flex flex-column">
+            <div class="row d-flex flex-column gap-3">
                 <h2>Students</h2>
                 <hr
                     style="height:2px; width:100%; border-width:0; color:rgb(107, 107, 107); background-color:rgb(107, 107, 107) ; padding-left: 12px;" />
                 {% if teacher.students %}
                 <h6>Send another <a href="/teacher/invoice">quote</a></h6>
-                <ul>
+                <ul class="list-group">
                     {% for student in teacher.students %}
                     {% if student.quote %}
-                    <li><a href="/student/{{student.is}}/profile">{{student.name}}</a> -
+                    <li class="list-group-item"><a href="/student/{{student.is}}/profile">{{student.name}}</a> -
                         <div class="badge alert-secondary d-inline">Quote Status : {{student.quote[0].quote_status}}
                         </div>
                     </li>
                     {% else %}
-                    <li><a href="/student/{{student.is}}/profile">{{student.name}}</a> - <div
+                    <li class="list-group-item"><a href="/student/{{student.is}}/profile">{{student.name}}</a> - <div
                             class="badge alert-primary d-inline">Enrollment:
                             {{student.subscription_status}}</div>
                     </li>
