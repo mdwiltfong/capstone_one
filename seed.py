@@ -1,5 +1,5 @@
 from datetime import datetime
-from models import Teacher, Student,db,connect_db,Invoice
+from models import Teacher, Student,db,connect_db,Quote
 from app import app
 from flask_bcrypt import Bcrypt
 

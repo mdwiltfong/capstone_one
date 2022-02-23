@@ -1,11 +1,11 @@
 
-from email.quoprimime import quote
+
 import os
 import pdb
 from flask import Flask, render_template, flash, redirect, session, jsonify,request,send_file
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-from models import Teacher, Student,db,connect_db
+from models import Teacher, Student,db,connect_db,Quote
 from forms import AddCustomer,StudentLogin, SubscriptionPlan,TeacherInvoice,QuoteForm
 from helper_functions import convert_quote
 import stripe
@@ -179,7 +179,7 @@ def quote_list():
         student_name=data["student_name"]
         try:
             student=Student.query.filter(Student.email==student_email,Student.name==student_name).first()
-            quote=stripe.Quote.retrieve(student.active_quote_id,
+            quote=stripe.Quote.retrieve(student.quote[0].stripeid,
             stripe_account=student.teacher[0].account_id
             )            
             session["quote_id"]=quote["id"]
@@ -188,21 +188,26 @@ def quote_list():
                 raise Exception
             return render_template("convert_quote.html",form=form,quote=quote,student=student)
         except Exception as e:
-            return jsonify(error='Hmm, there was an issue with your request')
+            flash("Hmm, there was an issue looking up your quote", "danger")
+            return redirect("/convert_quote")
     return render_template("convert_quote.html",form=form)
 
 @app.route("/handle_quote",methods=["post","get"])
 def handle_quote():
     #TODO We are creating subscriptions and quotes on the connected account. We should gather customer payment info for charging them later. 
-   resp=stripe.Quote.accept(session["quote_id"],
-   stripe_account=session["account_id"]   
-   )
-   invoice=stripe.Invoice.finalize_invoice(resp["invoice"],
-   stripe_account=session["account_id"],
-    expand=["payment_intent"]
-   )
-   session["client_secret"]=invoice["payment_intent"]["client_secret"]
-   return redirect("/checkout")
+    try:
+        resp=stripe.Quote.accept(session["quote_id"],
+        stripe_account=session["account_id"]   
+        )
+        invoice=stripe.Invoice.finalize_invoice(resp["invoice"],
+        stripe_account=session["account_id"],
+            expand=["payment_intent"]
+        )
+        session["client_secret"]=invoice["payment_intent"]["client_secret"]
+    except Exception as e:
+        flash("There was an issue accepting the quote","danger")
+        redirect("/handle_quote")
+    return redirect("/checkout")
 
 @app.route("/checkout",methods=["POST","GET"])
 def handle_checkout():
@@ -223,7 +228,10 @@ def teacher_profile(account_id):
         return redirect("/")
     
     teacher=Teacher.query.filter_by(account_id=account_id).first()
-    return render_template("teacher_profile.html",teacher=teacher)
+    balance=stripe.Balance.retrieve(stripe_account=teacher.account_id)
+    available=balance["available"][0]["amount"]/100
+    pending=balance["pending"][0]["amount"]/100
+    return render_template("teacher_profile.html",teacher=teacher,available_bal=available,pending_bal=pending)
 
 
 @app.route("/webhook",methods=["POST"])
@@ -278,6 +286,16 @@ def webhook_received():
                 db.session.add(teacher)
                 db.session.commit()
         except Exception as e:
-            print(e)
-    
+            return e
+    if event_type =="quote.finalized" or "quote.accepted":
+        try:
+            quote=Quote.query.filter(Quote.stripeid == data_object["id"]).first()
+            if quote is None:
+                raise Exception("Quote not found")
+            quote.quote_status=data_object["status"]
+            db.session.add(quote)
+            db.session.commit()
+        except Exception as e:
+            return e
+
     return jsonify({'status': 'success'})

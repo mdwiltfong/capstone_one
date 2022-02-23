@@ -1,3 +1,4 @@
+from enum import unique
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask import jsonify,send_file
@@ -77,7 +78,8 @@ class Teacher(db.Model):
     students=db.relationship('Student',
                             secondary='teachers_students',
                             backref='teacher'
-    )
+    ) 
+
 
 
     @classmethod
@@ -169,10 +171,6 @@ class Student(db.Model):
         db.Text,
         nullable=True
     )
-    active_quote_id=db.Column(
-        db.Text,
-        nullable=True
-    )
     name=db.Column(
         db.Text,
         nullable=False
@@ -201,13 +199,13 @@ class Student(db.Model):
         return f"<Student #{self.id}: {self.name}, {self.email}>"
 
 
-
     @classmethod
     def signup(cls,form,teacher):
 
         new_student=Student(
             email=form.student_email.data,
-            name=form.student_name.data
+            name=form.student_name.data,
+            subscription_status='incomplete'
         )
         customer=stripe.Customer.create(
                 email=new_student.email,
@@ -236,7 +234,9 @@ class Student(db.Model):
             stripe_account=account_id
         )
 
-        student.active_quote_id=quote["id"]
+        quote_db= Quote(stripeid=quote["id"],cadence=quote["computed"]["recurring"]["interval"],quote_status=quote["status"],total=quote["amount_total"])
+        student.quote.append(quote_db)
+        student.teacher[0].quotes.append(quote_db)
         db.session.add(student)
         db.session.commit()
         quote=stripe.Quote.finalize_quote(
@@ -299,47 +299,41 @@ class Student(db.Model):
         db.session.add(student)
         db.session.commit()
 
-class Invoice(db.Model):
-    __tablename__="invoices"
+class Quote(db.Model):
+    __tablename__="quotes"
 
     id = db.Column(
         db.Integer,
         autoincrement=True,
         primary_key=True
     )
-
-    teacher_id=db.Column(db.Integer,
-                        db.ForeignKey("teachers.id", ondelete="cascade"),        
-            )
-    student_id=db.Column(db.Integer,
-                        db.ForeignKey("students.id",ondelete="cascade"),
+    teacher_id=db.Column(
+        db.Integer,
+        db.ForeignKey("teachers.id", ondelete="cascade")
     )
-    service=db.Column(
+    student_id=db.Column(
+        db.Integer,
+        db.ForeignKey('students.id',ondelete="cascade")
+    )
+    quote_status=db.Column(
         db.Text
     )
-
-    hourly_rate=db.Column(
-        db.Integer
-    )
-
-    start_date=db.Column(
-        db.DateTime
+    stripeid=db.Column(
+        db.Text
     )
 
     cadence=db.Column(
         db.Text
     )
+    total=db.Column(
+        db.Integer
+    )
 
     def __repr__(self):
-        return f"<Invoice #{self.id}: {self.student_id}, {self.id}>"
+        return f"<Quote #{self.id}: {self.teacher_id}, {self.student_id}>"
         
-    student=db.relationship('Student',
-                            backref='invoices'
-    )
-    teacher=db.relationship('Teacher',
-                                backref="invoices"
-    )
-
+    teacher=db.relationship('Teacher',backref='quotes')
+    student=db.relationship('Student',backref='quote')
 
 class Teacher_Student(db.Model):
     __tablename__='teachers_students'
