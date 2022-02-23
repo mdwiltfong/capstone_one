@@ -1,5 +1,6 @@
 
 
+from crypt import methods
 import os
 import pdb
 from flask import Flask, render_template, flash, redirect, session, jsonify,request,send_file
@@ -101,10 +102,7 @@ def add_teacher():
     if form.validate_on_submit():
         try:
             new_teacher_acct=Teacher.signup(
-                username=form.username.data,
-                email=form.email.data,
-                password=form.password.data,
-                photo_url=form.photo_url.data
+                form
             )
 
             session["curr_user"]=new_teacher_acct["new_account"]["id"]
@@ -119,6 +117,10 @@ def add_teacher():
 
     return render_template('add_teacher.html',form=form)
 
+@app.route("/teacher/signup/success",methods=["GET","POST"])
+def signup_successful():
+    flash("Signup Successful","success")
+    return redirect(f'/teacher/{session["curr_user"]}/profile')
 ######Invoices Created By Teachers#############
 
 @app.route("/teacher/invoice",methods=["GET","POST"])
