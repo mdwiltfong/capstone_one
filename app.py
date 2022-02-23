@@ -228,7 +228,10 @@ def teacher_profile(account_id):
         return redirect("/")
     
     teacher=Teacher.query.filter_by(account_id=account_id).first()
-    return render_template("teacher_profile.html",teacher=teacher)
+    balance=stripe.Balance.retrieve(stripe_account=teacher.account_id)
+    available=balance["available"][0]["amount"]/100
+    pending=balance["pending"][0]["amount"]/100
+    return render_template("teacher_profile.html",teacher=teacher,available_bal=available,pending_bal=pending)
 
 
 @app.route("/webhook",methods=["POST"])
