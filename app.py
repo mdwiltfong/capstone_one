@@ -179,7 +179,7 @@ def quote_list():
         student_name=data["student_name"]
         try:
             student=Student.query.filter(Student.email==student_email,Student.name==student_name).first()
-            quote=stripe.Quote.retrieve(student.active_quote_id,
+            quote=stripe.Quote.retrieve(student.quote[0].stripeid,
             stripe_account=student.teacher[0].account_id
             )            
             session["quote_id"]=quote["id"]
@@ -188,21 +188,26 @@ def quote_list():
                 raise Exception
             return render_template("convert_quote.html",form=form,quote=quote,student=student)
         except Exception as e:
-            return jsonify(error='Hmm, there was an issue with your request')
+            flash("Hmm, there was an issue looking up your quote", "danger")
+            return redirect("/convert_quote")
     return render_template("convert_quote.html",form=form)
 
 @app.route("/handle_quote",methods=["post","get"])
 def handle_quote():
     #TODO We are creating subscriptions and quotes on the connected account. We should gather customer payment info for charging them later. 
-   resp=stripe.Quote.accept(session["quote_id"],
-   stripe_account=session["account_id"]   
-   )
-   invoice=stripe.Invoice.finalize_invoice(resp["invoice"],
-   stripe_account=session["account_id"],
-    expand=["payment_intent"]
-   )
-   session["client_secret"]=invoice["payment_intent"]["client_secret"]
-   return redirect("/checkout")
+    try:
+        resp=stripe.Quote.accept(session["quote_id"],
+        stripe_account=session["account_id"]   
+        )
+        invoice=stripe.Invoice.finalize_invoice(resp["invoice"],
+        stripe_account=session["account_id"],
+            expand=["payment_intent"]
+        )
+        session["client_secret"]=invoice["payment_intent"]["client_secret"]
+    except Exception as e:
+        flash("There was an issue accepting the quote","danger")
+        redirect("/handle_quote")
+    return redirect("/checkout")
 
 @app.route("/checkout",methods=["POST","GET"])
 def handle_checkout():

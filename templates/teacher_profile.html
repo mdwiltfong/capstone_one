@@ -52,7 +52,7 @@
                 <h6>Send another <a href="/teacher/invoice">quote</a></h6>
                 <ul class="list-group">
                     {% for student in teacher.students %}
-                    {% if student.quote %}
+                    {% if student.quote and student.quote[0].quote_status != 'accepted' %}
                     <li class="list-group-item"><a href="/student/{{student.is}}/profile">{{student.name}}</a> -
                         <div class="badge alert-secondary d-inline">Quote Status : {{student.quote[0].quote_status}}
                         </div>
