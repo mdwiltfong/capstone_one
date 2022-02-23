@@ -13,8 +13,8 @@
     {% endfor %}
     <div class="container d-flex flex-row justify-content-center">
 
-        <div class="teacher-details column mx-3">
-            <div class="container row" style="height:200px; width: auto;">
+        <div class="teacher-details column mx-5">
+            <div class="container row p-0" style="height:200px; width: auto;">
                 {% if teacher.photo_url == None %}
                 <img style="max-width: 200px; height:auto"
                     src="{{ url_for('static', filename='assets/default_profile_pic.png') }}" class="img-thumbnail"
@@ -27,12 +27,12 @@
 
             </div>
             <div class="teacher-info row d-flex flex-column">
-                <p style="color: white;">
+                <div style="color: white;">
                     Username: {{teacher.username}}
-                </p>
-                <p style="color: white;">
+                </div>
+                <div style="color: white;">
                     Email: {{teacher.email}}
-                </p>
+                </div>
                 <div class="container">
                     <p class="d-inline">
                         Pending Balance:
