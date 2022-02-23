@@ -83,22 +83,34 @@ class Teacher(db.Model):
 
 
     @classmethod
-    def signup(cls,username,email,password):
-        hashed_pwd=bcrypt.generate_password_hash(password).decode('UTF-8')
+    def signup(cls,form):
+        hashed_pwd=bcrypt.generate_password_hash(form.password.data).decode('UTF-8')
+        photo_url = None if form.photo_url.data == '' else form.photo_url.data
         new_teacher=Teacher(
-            username=username,
-            email=email,
-            password=hashed_pwd          
+            username=form.username.data,
+            email=form.email.data,
+            password=hashed_pwd,
+            photo_url=photo_url,
+            city=form.city.data,    
+            state=form.state.data      
         )
+        name=form.name.data
+        name_list=name.strip().split(" ")
+        first_name=name_list[0]
+        last_name=name_list[1]
         new_account=stripe.Account.create(
             type="express",
             country="US",
-            email=email,
+            email=form.email.data,
             capabilities={
                 "card_payments":{"requested":True},
                 "transfers":{"requested":True}
             },
             business_type="individual",            
+            individual={
+                "first_name":first_name,
+                "last_name":last_name
+            }
         )
 
         ## TODO #41 We will need to change the Teacher model to handle this new onboarding

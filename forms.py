@@ -14,7 +14,7 @@ class AddCustomer(FlaskForm):
     photo_url=StringField('Profile Picture',validators=[Optional(),url(message="This is not a valid URL")])
     city=StringField("City", validators=[InputRequired()])
     state=StringField("State", validators=[InputRequired()])
-    
+    name=StringField("Name",validators=[InputRequired()])
 class PaymentDetails(FlaskForm):    
     name=StringField("Name (as it appears on your card)",validators=[InputRequired()])
     card_number=StringField("Card Number (no dashes or spaces)",validators=[InputRequired()])
