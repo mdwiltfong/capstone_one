@@ -27,7 +27,8 @@ svg {
 
 p,
 h6,
-h2 {
+h2,
+label {
   color: #ffffff;
 }
 
@@ -38,4 +39,8 @@ a {
 .teacher-info div {
   padding: 0px;
   margin: 10px 0;
+}
+
+.hidden {
+  display: none;
 }
