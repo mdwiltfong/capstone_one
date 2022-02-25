@@ -4,7 +4,7 @@ Invoice
 {% endblock title %}
 
 {% block content %}
-<div class="container">
+<div id="quote_container" class="container">
     <h1 class="display-1 text-center">Send a Quote</h1>
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -28,12 +28,18 @@ Invoice
 
                 {% endfor %}
                 <button type="submit" class="btn btn-success btn-lg">Submit</button>
-                <!-- TODO #37 This cancel button is still trying to submit the form -->
                 <a href="/teacher/{{teacher.account_id}}/profile" class="btn btn-danger btn-lg">Cancel</a>
             </form>
         </div>
-
     </div>
 
 </div>
+
+</div>
+<div id="loader" style="height:100%" class="d-flex justify-content-center visually-hidden align-items-center">
+    <div class="spinner-border  text-info" style="width:5rem; height:5rem" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+<script src="../static/convert_quote.js"></script>
 {% endblock content %}
