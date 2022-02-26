@@ -1,6 +1,6 @@
 html,
 body {
-  background-color: #2e2a78;
+  background-color: #6772e5;
   height: 100%;
 }
 
@@ -16,8 +16,8 @@ h1 {
 }
 
 .btn-primary {
-  background-color: #7a73ff;
-  border-color: #7a73ff;
+  background-color: #16db93;
+  border-color: #16db93;
   font-size: 22px;
 }
 svg {
