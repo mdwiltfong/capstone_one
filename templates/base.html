@@ -30,43 +30,46 @@
 
 <body>
 
-  <nav class="navbar navbar-expand px-3 d-flex justify-content-end">
+  <nav class="navbar navbar-expand px-3 ">
+    <div class="w-100 d-flex justify-content-between">
+      <a style="color:white; font-size: 20px;" class="navbar-brand p-0" href="/">
+        <img class="d-inline-block align-text-center" src="../static/assets/Logo1.png" alt="Teacher Pay Logo" width="40"
+          height="40">
+        Teacher Pay
+      </a>
+      <div class="" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          {% if "curr_user" in session %}
+          <li class="nav-item">
+            <a style="color:white; font-size: 20px;" class="nav-link" href="/logout">Logout</a>
+          </li>
+          {% if "teacher" in session %}
+          <li class="nav-item">
+            <a href="/teacher/{{session['curr_user']}}/profile" class="nav-link"
+              style="color:white; font-size: 20px;">Profile
+              Page</a>
+          </li>
+          {% endif %} {% else %}
 
-    <a style="color:white; font-size: 20px;" class="navbar-brand p-0" href="/">
-    <img class="d-inline-block align-text-center" src="../static/assets/Logo1.png" alt="Teacher Pay Logo" width="40" height="40">
-      Teacher Pay
-    </a>
-    <div class="" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto">
-        {% if "curr_user" in session %}
-        <li class="nav-item">
-          <a style="color:white; font-size: 20px;" class="nav-link" href="/logout">Logout</a>
-        </li>
-        {% if "teacher" in session %}
-        <li class="nav-item">
-          <a href="/teacher/{{session['curr_user']}}/profile" class="nav-link"
-            style="color:white; font-size: 20px;">Profile
-            Page</a>
-        </li>
-        {% endif %} {% else %}
+          <li class="nav-item active">
+            <a style="color:white; font-size: 20px;" class="nav-link" href="/signup">Signup <span
+                class="sr-only"></span></a>
+          </li>
+          <li class="nav-item">
+            <a style="color:white; font-size: 20px;" class="nav-link" href="/teacher/login">Login</a>
+          </li>
+          {% endif %}
+          <li class="nav-item active">
+            <a style="color:white; font-size: 20px;" class="nav-link" href="/about">About <span
+                class="sr-only"></span></a>
+          </li>
+          <li class="nav-item" id="enroll">
+            <a href="/convert_quote" class="nav-link" style="color:white; font-size: 20px;">Convert Quote</a>
+          </li>
 
-        <li class="nav-item active">
-          <a style="color:white; font-size: 20px;" class="nav-link" href="/signup">Signup <span
-              class="sr-only"></span></a>
-        </li>
-        <li class="nav-item">
-          <a style="color:white; font-size: 20px;" class="nav-link" href="/teacher/login">Login</a>
-        </li>
-        {% endif %}
-        <li class="nav-item active">
-          <a style="color:white; font-size: 20px;" class="nav-link" href="/about">About <span
-              class="sr-only"></span></a>
-        </li>
-        <li class="nav-item" id="enroll">
-          <a href="/convert_quote" class="nav-link" style="color:white; font-size: 20px;">Convert Quote</a>
-        </li>
+        </ul>
+      </div>
 
-      </ul>
     </div>
 
   </nav>
