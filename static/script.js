@@ -28,7 +28,7 @@ window.addEventListener("DOMContentLoaded", () => {
     };
 
     elements = stripe.elements({ clientSecret, appearance });
-    cardElement = elements.create("card");
+    cardElement = elements.create("card", appearance);
     cardElement.mount("#payment-element");
   });
 });
