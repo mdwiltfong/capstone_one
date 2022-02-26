@@ -29,9 +29,13 @@
 </head>
 
 <body>
+
   <nav class="navbar navbar-expand px-3 d-flex justify-content-end">
 
-    <a style="color:white; font-size: 20px;" class="navbar-brand" href="/">Home</a>
+    <a style="color:white; font-size: 20px;" class="navbar-brand p-0" href="/">
+    <img class="d-inline-block align-text-center" src="../static/assets/Logo1.png" alt="Teacher Pay Logo" width="40" height="40">
+      Teacher Pay
+    </a>
     <div class="" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         {% if "curr_user" in session %}
