@@ -3,11 +3,32 @@ let stripe, clientSecret, elements, cardElement;
 window.addEventListener("DOMContentLoaded", () => {
   getConfig().then(() => {
     const appearance = {
-      theme: "flat",
+      iconStyle: "solid",
+      style: {
+        base: {
+          iconColor: "#fff",
+          color: "#fff",
+          fontWeight: 400,
+          fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
+          fontSize: "16px",
+          fontSmoothing: "antialiased",
+
+          "::placeholder": {
+            color: "#BFAEF6",
+          },
+          ":-webkit-autofill": {
+            color: "white",
+          },
+        },
+        invalid: {
+          iconColor: "#FFC7EE",
+          color: "#FFC7EE",
+        },
+      },
     };
 
     elements = stripe.elements({ clientSecret, appearance });
-    cardElement = elements.create("card");
+    cardElement = elements.create("card", appearance);
     cardElement.mount("#payment-element");
   });
 });
@@ -25,7 +46,13 @@ async function getConfig() {
 // helper method for displaying a status message.
 const setMessage = (message) => {
   const messageDiv = document.querySelector("#messages");
-  messageDiv.innerHTML += "<br>" + message;
+  if (message.error) {
+    messageDiv.className += " w-25 alert alert-danger";
+    messageDiv.innerHTML += message.error.message;
+  } else {
+    messageDiv.className = "w-25 alert alert-success";
+    messageDiv.innerHTML += message;
+  }
 };
 const form = document.querySelector("#payment-form");
 form.addEventListener("submit", async (e) => {
@@ -59,7 +86,7 @@ form.addEventListener("submit", async (e) => {
     })
     .then((result) => {
       if (result.error) {
-        setMessage(`Payment failed: ${result.error.message}`);
+        setMessage(result);
       } else {
         // Redirect the customer to their account page
         console.log("--->", result);

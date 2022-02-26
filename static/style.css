@@ -13,17 +13,23 @@ h1 {
   color: #ffff;
 }
 
-.content h1 {
+.content h1,
+h1 {
   z-index: 100;
   font-size: 60px;
   color: #ffff;
   font-family: "Josefin Sans", sans-serif;
 }
 
-.btn-primary {
+.btn {
   background-color: #16db93;
   border-color: #16db93;
   font-size: 22px;
+  color: white;
+}
+
+.btn:hover {
+  color: #6772e5;
 }
 svg {
   height: 20px;
@@ -58,4 +64,18 @@ a {
 
 #enroll a {
   padding: 4px 4px;
+}
+
+#invoice {
+  position: absolute;
+  bottom: 100px;
+  right: 100px;
+  z-index: 0;
+  opacity: 40%;
+  height: 500px;
+  width: 500px;
+}
+
+#teacher {
+  z-index: 1;
 }

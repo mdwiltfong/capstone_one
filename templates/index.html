@@ -26,7 +26,7 @@ Homepage
         </span>
         {% else %}
 
-        <div class="container">
+        <div class="container p-0">
             <h1 class="" style="font-size: 90px ">Teacher Pay</h1>
         </div>
         <!-- TODO `Teacher Pay` and below text are off centered. `Teacher Pay` might have some sort of padding or margin on it's left -->
@@ -39,7 +39,7 @@ Homepage
             </p>
             <span class="w-25">
                 <!-- TODO Re-align `sign up` button  -->
-                <a href="/teacher/signup" class="btn btn-primary">Sign up</a>
+                <a href="/teacher/signup" class="btn">Sign up</a>
 
             </span>
         </div>
@@ -50,6 +50,7 @@ Homepage
 
     </span>
     <!--Photo by Christina Morillo from Pexels  -->
-    <img src="../static/assets/Home_Page_Image.PNG" alt="Image of African-American man smiling">
+    <img id="teacher" src="../static/assets/Home_Page_Image.PNG" alt="Image of African-American man smiling">
+    <img id="invoice" src="../static/7CD54466-22BF-4D3A-AC0D-1B92E87F0201.PNG" alt="" srcset="">
 </div>
 {% endblock content %}
