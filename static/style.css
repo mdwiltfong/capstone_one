@@ -4,6 +4,11 @@ body {
   height: 100%;
 }
 
+body {
+  max-width: 80%;
+  margin: 0 auto;
+}
+
 h1 {
   color: #ffff;
 }
@@ -43,4 +48,14 @@ a {
 
 .hidden {
   display: none;
+}
+
+#enroll {
+  border-radius: 5px;
+  border: 2px solid #16db93;
+  padding: 0px;
+}
+
+#enroll a {
+  padding: 4px 4px;
 }
