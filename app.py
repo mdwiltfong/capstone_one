@@ -181,12 +181,16 @@ def quote_list():
             student=Student.query.filter(Student.email==student_email,Student.name==student_name).first()
             quote=stripe.Quote.retrieve(student.quote[0].stripeid,
             stripe_account=student.teacher[0].account_id
-            )            
+            )   
+            line_items=stripe.Quote.list_line_items(quote["id"],
+            stripe_account=student.teacher[0].account_id
+            )
+            description=line_items["data"][0]['description']
             session["quote_id"]=quote["id"]
             session["account_id"]=student.teacher[0].account_id
             if student is None:
                 raise Exception
-            return render_template("convert_quote.html",form=form,quote=quote,student=student)
+            return render_template("convert_quote.html",form=form,quote=quote,student=student,description=description)
         except Exception as e:
             flash("Hmm, there was an issue looking up your quote", "danger")
             return redirect("/convert_quote")

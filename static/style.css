@@ -13,7 +13,8 @@ h1 {
   color: #ffff;
 }
 
-.content h1 {
+.content h1,
+h1 {
   z-index: 100;
   font-size: 60px;
   color: #ffff;

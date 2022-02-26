@@ -11,7 +11,8 @@ Invoice
             <p class="w-25 alert alert-{{category}} m-0">{{msg}}</p>
             {% endfor %}
         </div>
-        <h1 class="display-1 text-center">Enroll Today!</h1>
+        <h1 class="display-1 text-center mb-3">Enrollment</h1>
+
 
         <div class="row d-flex justify-content-center">
 
@@ -47,6 +48,7 @@ Invoice
                         <div class="card-body">
                             <ul class="list-group">
                                 <li class="list-group-item">{{quote["number"]}}</li>
+                                <li class="list-group-item">{{description}}</li>
                                 <li class="list-group-item">Total: {{quote["amount_total"]/100}}
                                     {{quote["currency"].upper()}}
                                     per
