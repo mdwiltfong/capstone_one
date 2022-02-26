@@ -196,6 +196,9 @@ def handle_quote():
 
 @app.route("/checkout",methods=["POST","GET"])
 def handle_checkout():
+    if "curr_user" not in session:
+        flash("You must be logged in to access this page","danger");
+        return redirect("/")
     return render_template("checkout.html",clientSecret=session["client_secret"])
 
 @app.route("/config",methods=["GET"])
