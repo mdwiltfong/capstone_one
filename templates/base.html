@@ -33,8 +33,10 @@
   <nav class="navbar navbar-expand px-3 ">
     <div class="w-100 d-flex justify-content-between">
       <a style="color:white; font-size: 20px;" class="navbar-brand p-0" href="/">
-        <img class="d-inline-block align-text-center" src="../static/assets/Logo1.png" alt="Teacher Pay Logo" width="40"
+        <img class="d-inline-block align-text-center"
+          src="{{ url_for('static', filename='../static/assets/Logo1.png') }}" alt="Teacher Pay Logo" width="40"
           height="40">
+
         Teacher Pay
       </a>
       <div class="" id="navbarSupportedContent">
