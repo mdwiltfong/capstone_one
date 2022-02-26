@@ -32,9 +32,7 @@ db.create_all()
 def homepage():
     return render_template('index.html')
 
-@app.route("/signup")
-def signup():
-    return render_template("signup.html")
+
 
 @app.route("/about")
 def load_about():
