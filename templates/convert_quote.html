@@ -4,10 +4,11 @@ Invoice
 {% endblock title %}
 
 {% block content %}
-<div class="container">
-    <h1 class="display-1 text-center">Convert a Quote into a Subscription</h1>
+<div class="container py-5">
+    <h1 class="display-1 text-center">Enroll Today!</h1>
+
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-8 d-flex flex-grow-5 justify-content-center">
             {% for category, msg in get_flashed_messages(with_categories=true) %}
             <div class="container d-flex justify-content-center">
                 <p class="w-25 alert alert-{{category}}">{{msg}}</p>
@@ -19,7 +20,7 @@ Invoice
                 if field.widget.input_type !='hidden' %}
                 <div class="form-group">
                     {{field.label }}
-                    {{field(class_="form-control")}}
+                    {{field(class_="form-control ")}}
                     {% for err in field.errors %}
                     <small class="form-text text-danger">
                         {{err}}
@@ -29,8 +30,8 @@ Invoice
                 </div>
 
                 {% endfor %}
-                <button type="submit" class="btn btn-success btn-lg">Submit</button>
-                <a href="/" class="btn btn-danger btn-lg">Cancel</a>
+                <button type="submit" class="btn btn-lg">Submit</button>
+                <a href="/" class="btn btn-lg">Cancel</a>
             </form>
         </div>
 

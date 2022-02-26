@@ -20,10 +20,15 @@ h1 {
   font-family: "Josefin Sans", sans-serif;
 }
 
-.btn-primary {
+.btn {
   background-color: #16db93;
   border-color: #16db93;
   font-size: 22px;
+  color: white;
+}
+
+.btn:hover {
+  color: #6772e5;
 }
 svg {
   height: 20px;
