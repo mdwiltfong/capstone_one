@@ -5,56 +5,65 @@ Invoice
 
 {% block content %}
 <div class="container py-5">
-    <h1 class="display-1 text-center">Enroll Today!</h1>
-
-    <div class="row justify-content-center">
-        <div class="col-md-8 d-flex flex-grow-5 justify-content-center">
+    <div class="col">
+        <div class="container d-flex justify-content-center" style="min-height:82px">
             {% for category, msg in get_flashed_messages(with_categories=true) %}
-            <div class="container d-flex justify-content-center">
-                <p class="w-25 alert alert-{{category}}">{{msg}}</p>
-            </div>
+            <p class="w-25 alert alert-{{category}} m-0">{{msg}}</p>
             {% endfor %}
-            <form action="" method="post">
-                {{form.hidden_tag()}}
-                {% for field in form
-                if field.widget.input_type !='hidden' %}
-                <div class="form-group">
-                    {{field.label }}
-                    {{field(class_="form-control ")}}
-                    {% for err in field.errors %}
-                    <small class="form-text text-danger">
-                        {{err}}
+        </div>
+        <h1 class="display-1 text-center">Enroll Today!</h1>
 
-                    </small>
+        <div class="row justify-content-center">
+
+            <div class="col-md-8 d-flex justify-content-center">
+                <form class="w-50 " action="" method="post">
+                    {{form.hidden_tag()}}
+                    {% for field in form
+                    if field.widget.input_type !='hidden' %}
+                    <div class="form-group">
+                        {{field.label }}
+                        {{field(class_="form-control")}}
+                        {% for err in field.errors %}
+                        <small class="form-text text-danger">
+                            {{err}}
+
+                        </small>
+                        {% endfor %}
+                    </div>
+
                     {% endfor %}
-                </div>
+                    <div class="container d-flex justify-content-center mt-3">
+                        <button type="submit" class="btn mx-1">Submit</button>
+                        <a href="/" class="btn ">Cancel</a>
 
-                {% endfor %}
-                <button type="submit" class="btn btn-lg">Submit</button>
-                <a href="/" class="btn btn-lg">Cancel</a>
-            </form>
+                    </div>
+                </form>
+            </div>
+
+            {% if quote and student %}
+            <div class="container" id="quote_list" style="min-height: 500px;">
+                <form action="/handle_quote" method="GET" class="card">
+                    <div class="card-header">
+                        {{student.name}}
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item">{{quote["number"]}}</li>
+                            <li class="list-group-item">Total: {{quote["amount_total"]/100}}
+                                {{quote["currency"].upper()}}
+                                per
+                                {{quote["computed"]["recurring"]["interval"]}} </li>
+
+                        </ul>
+                        <button class="btn btn-primary"> Pay Now </button>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+
         </div>
-
-        {% if quote and student %}
-        <div class="container" id="quote_list" style="min-height: 500px;">
-            <form action="/handle_quote" method="GET" class="card">
-                <div class="card-header">
-                    {{student.name}}
-                </div>
-                <div class="card-body">
-                    <ul class="list-group">
-                        <li class="list-group-item">{{quote["number"]}}</li>
-                        <li class="list-group-item">Total: {{quote["amount_total"]/100}} {{quote["currency"].upper()}}
-                            per
-                            {{quote["computed"]["recurring"]["interval"]}} </li>
-
-                    </ul>
-                    <button class="btn btn-primary">Subscribe</button>
-                </div>
-            </form>
-        </div>
-        {% endif %}
-
     </div>
+
+    <img id="invoice" src="../static/7CD54466-22BF-4D3A-AC0D-1B92E87F0201.PNG" alt="" srcset="">
 </div>
 {% endblock content %}
