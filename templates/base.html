@@ -29,16 +29,15 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-expand px-3" style="background-color: transparent;">
-    <a href="/" class="navbar-brand p-0">
-      <!--TODO "Teacher Pay" needs to be styled-->
-      <img class="d-inline-block align-text-center" src="../static/assets/Logo1.png" alt="Teacher Pay Logo" width="40" height="40">
+
+  <nav class="navbar navbar-expand px-3 d-flex justify-content-end">
+
+    <a style="color:white; font-size: 20px;" class="navbar-brand p-0" href="/">
+    <img class="d-inline-block align-text-center" src="../static/assets/Logo1.png" alt="Teacher Pay Logo" width="40" height="40">
       Teacher Pay
     </a>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <div class="" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        <!-- @AndreaDubuc the jinja template below is an if statement.
-                    If a user is logged in, they'll see a logout option. If not, they'll see a login option -->
         {% if "curr_user" in session %}
         <li class="nav-item">
           <a style="color:white; font-size: 20px;" class="nav-link" href="/logout">Logout</a>
@@ -46,11 +45,10 @@
         {% if "teacher" in session %}
         <li class="nav-item">
           <a href="/teacher/{{session['curr_user']}}/profile" class="nav-link"
-            style="color:white; font-size: 20px;">Profile Page</a>
+            style="color:white; font-size: 20px;">Profile
+            Page</a>
         </li>
         {% endif %} {% else %}
-
-
 
         <li class="nav-item active">
           <a style="color:white; font-size: 20px;" class="nav-link" href="/signup">Signup <span
@@ -64,12 +62,13 @@
           <a style="color:white; font-size: 20px;" class="nav-link" href="/about">About <span
               class="sr-only"></span></a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" id="enroll">
           <a href="/convert_quote" class="nav-link" style="color:white; font-size: 20px;">Convert Quote</a>
         </li>
-        
+
       </ul>
     </div>
+
   </nav>
   {% block content %} {% endblock content %}
 
