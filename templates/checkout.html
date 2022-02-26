@@ -5,13 +5,14 @@ block stylesheet %}
 {% endblock stylesheet %} {% block script %}
 <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 {% endblock script %} {% block content %}
-<div class="cell example example5" id="example-5">
+<span style="min-height:82px" class="container d-flex justify-content-center" id="messages"></span>
+<div class="cell example example5" id="example-5" style="max-width:40%; margin: 0 auto">
   <form id="payment-form">
     <div id="example5-paymentRequest">
       <!--Stripe paymentRequestButton Element inserted here-->
     </div>
     <fieldset>
-      <legend class="card-only" data-tid="elements_examples.form.pay_with_card">Pay with card</legend>
+
       <legend class="payment-request-available" data-tid="elements_examples.form.enter_card_manually">Or enter card
         details</legend>
       <div class="row">
@@ -65,9 +66,9 @@ block stylesheet %}
           <div id="payment-element" class="input"></div>
         </div>
       </div>
-      <button type="submit" data-tid="elements_examples.form.pay_button">Pay $25</button>
+      <button type="submit" data-tid="elements_examples.form.pay_button">Pay Now</button>
     </fieldset>
-    <span id="messages"></span>
+
 </div>
 </form>
 </section>

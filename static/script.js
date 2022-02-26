@@ -17,7 +17,7 @@ window.addEventListener("DOMContentLoaded", () => {
             color: "#BFAEF6",
           },
           ":-webkit-autofill": {
-            color: "#fce883",
+            color: "white",
           },
         },
         invalid: {
@@ -46,7 +46,13 @@ async function getConfig() {
 // helper method for displaying a status message.
 const setMessage = (message) => {
   const messageDiv = document.querySelector("#messages");
-  messageDiv.innerHTML += "<br>" + message;
+  if (message.error) {
+    messageDiv.className += " w-25 alert alert-danger";
+    messageDiv.innerHTML += message.error.message;
+  } else {
+    messageDiv.className = "w-25 alert alert-success";
+    messageDiv.innerHTML += message;
+  }
 };
 const form = document.querySelector("#payment-form");
 form.addEventListener("submit", async (e) => {
@@ -80,7 +86,7 @@ form.addEventListener("submit", async (e) => {
     })
     .then((result) => {
       if (result.error) {
-        setMessage(`Payment failed: ${result.error.message}`);
+        setMessage(result);
       } else {
         // Redirect the customer to their account page
         console.log("--->", result);
