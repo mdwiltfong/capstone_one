@@ -47,23 +47,6 @@ def logout():
 #####################################Student Routes
 
 
-@app.route("/student/login", methods=["GET","POST"])
-def student_login():
-    form=StudentLogin()
-    if form.validate_on_submit():
-        password=form.password.data
-        username=form.username.data
-        student=Student.authentication(username,password)
-        if student:
-            session["curr_user"]=student.id
-            flash("You've logged in!","success")
-            return redirect("/")
-        else:
-            flash("Hmmm, password or username are incorrect","danger")
-            return redirect("/student/login")
-    
-    return render_template("student_login.html",form=form)
-
 @app.route('/student/signup',methods=["GET","POST"])
 def add_student():
     form=AddCustomer()

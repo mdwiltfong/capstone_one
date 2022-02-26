@@ -3,35 +3,72 @@
 Sign Up
 {% endblock title %}
 {% block content %}
-<div class="container">
-    <h1 class="display-1 text-center">Add New Teacher</h1>
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            {% for msg in get_flashed_messages() %}
-            <p class="bg-danger">{{msg}}</p>
+<div class="container py-5">
+    <div class="col">
+        <div class="container d-flex justify-content-center" style="min-height:82px">
+            {% for category, msg in get_flashed_messages(with_categories=true) %}
+            <p class="w-25 alert alert-{{category}} m-0">{{msg}}</p>
             {% endfor %}
-            <form action="" method="post">
-                {{form.hidden_tag()}}
-                {% for field in form
-                if field.widget.input_type !='hidden' %}
-                <div class="form-group">
-                    {{field.label }}
-                    {{field(class_="form-control")}}
-                    {% for err in field.errors %}
-                    <small class="form-text text-danger">
-                        {{err}}
-
-                    </small>
-                    {% endfor %}
-                </div>
-
-                {% endfor %}
-                <button class="btn btn-success btn-lg">Next</button>
-                <a href="/" class="btn btn-danger btn-lg">Cancel</a>
-            </form>
         </div>
+        <h1 class="display-1 text-center mb-3">Sign Up</h1>
 
+
+        <div class="row d-flex justify-content-center">
+
+            <div class="col-md-8 flex-column d-flex justify-content-center">
+                <form style="margin:0 auto" class="w-50 " action="" method="post">
+                    {{form.hidden_tag()}}
+                    {% for field in form
+                    if field.widget.input_type !='hidden' %}
+                    <div class="form-group">
+                        {{field.label }}
+                        {{field(class_="form-control")}}
+                        {% for err in field.errors %}
+                        <small class="form-text text-info">
+                            {{err}}
+
+                        </small>
+                        {% endfor %}
+                    </div>
+
+                    {% endfor %}
+                    <div class="container d-flex justify-content-center mt-3">
+                        <button type="submit" class="btn mx-1 btn-sm">Submit</button>
+                        <a href="/" class="btn btn-sm ">Cancel</a>
+
+                    </div>
+                </form>
+                {% if quote and student %}
+                <div class="container my-5 w-50" id="quote_list" style="min-height: 500px;">
+                    <form action="/handle_quote" method="GET" class="card">
+                        <div class="card-header">
+                            {{student.name}}
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item">{{quote["number"]}}</li>
+                                <li class="list-group-item">{{description}}</li>
+                                <li class="list-group-item">Total: {{quote["amount_total"]/100}}
+                                    {{quote["currency"].upper()}}
+                                    per
+                                    {{quote["computed"]["recurring"]["interval"]}} </li>
+
+                            </ul>
+                            <div class="container d-flex justify-content-center">
+
+                                <button class="btn mt-3 btn-sm"> Pay Now </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+
+            </div>
+
+
+        </div>
     </div>
 
+    <img id="invoice" src="../static/7CD54466-22BF-4D3A-AC0D-1B92E87F0201.PNG" alt="" srcset="">
 </div>
 {% endblock content %}
