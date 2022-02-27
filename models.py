@@ -216,11 +216,12 @@ class Student(db.Model):
 
         new_student=Student(
             email=form.student_email.data,
-            name=form.student_name.data,
+            name=form.first_name.data + " " + form.last_name.data,
             subscription_status='incomplete'
         )
         customer=stripe.Customer.create(
                 email=new_student.email,
+                name=form.first_name.data + " " + form.last_name.data,
                 metadata={
                     "username": new_student.username,
                     "db_id":new_student.id,
