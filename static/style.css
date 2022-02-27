@@ -34,8 +34,8 @@ h1 {
 svg {
   height: 20px;
   width: 25px;
+  fill: white;
 }
-
 p,
 h6,
 h2,
@@ -47,7 +47,7 @@ a {
   color: #00a7e1;
 }
 
-.teacher-info div {
+#teacher-info div {
   padding: 0px;
   margin: 10px 0;
 }
@@ -78,4 +78,8 @@ a {
 
 #teacher {
   z-index: 1;
+}
+
+p {
+  font-size: 20px;
 }
