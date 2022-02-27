@@ -42,7 +42,7 @@
                     <p class="d-inline my-0">
                         Pending Balance:
                     </p>
-                    <div class="badge alert-primary d-inline">$ {{pending_bal}}</div>
+                    <div class="badge alert-primary d-inline">${{"{price:.2f}".format(price=pending_bal)}}</div>
 
                 </div>
                 {% if available_bal >0 %}
@@ -50,7 +50,8 @@
                     <p class="d-inline">
                         Available Balance:
                     </p>
-                    <div class="badge alert-primary d-inline">{{available_bal}}</div>
+                    <div class="badge alert-primary d-inline">
+                        ${{"{price:.2f}".format(price=available_bal)}}</div>
 
                 </div>
 

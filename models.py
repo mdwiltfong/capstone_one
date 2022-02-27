@@ -212,6 +212,7 @@ class Student(db.Model):
 
     @classmethod
     def signup(cls,form,teacher):
+
         try: 
             for student in teacher.students:
                 if form.student_email.data == student.email:
@@ -220,6 +221,7 @@ class Student(db.Model):
                 email=form.student_email.data,
                 name=form.student_name.data,
                 subscription_status='incomplete'
+
             )
             customer=stripe.Customer.create(
                     email=new_student.email,
