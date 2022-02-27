@@ -91,7 +91,6 @@ form.addEventListener("submit", async (e) => {
         // Redirect the customer to their account page
         console.log("--->", result);
         setMessage("Success! Redirecting to your account.");
-        window.location.href = "/checkout_successful";
       }
     });
 });
