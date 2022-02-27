@@ -11,10 +11,10 @@
         <p class="w-25 alert alert-{{category}}">{{msg}}</p>
     </div>
     {% endfor %}
-    <div class="container d-flex flex-row justify-content-center">
+    <div class="container d-flex flex-row justify-content-center my-5">
 
-        <div class="teacher-details column mx-5">
-            <div class="container row p-0" style="height:200px; width: auto;">
+        <div class="teacher-details column my-5 mx-5">
+            <div class="container row p-0" style="height:auto; width: auto;">
                 {% if teacher.photo_url == None %}
                 <img style="max-width: 200px; height:auto"
                     src="{{ url_for('static', filename='assets/default_profile_pic.png') }}" class="img-thumbnail"
@@ -28,10 +28,15 @@
             </div>
             <div class="teacher-info row d-flex flex-column">
                 <div style="color: white;">
-                    Username: {{teacher.username}}
+                    <p>
+                        Username: {{teacher.username}}
+                    </p>
                 </div>
                 <div style="color: white;">
-                    Email: {{teacher.email}}
+                    <p>
+                        Email: {{teacher.email}}
+
+                    </p>
                 </div>
                 <div class="container">
                     <p class="d-inline">
@@ -53,7 +58,7 @@
 
             </div>
         </div>
-        <div class="profile-content column">
+        <div class="profile-content column m-5">
             <div class="row d-flex flex-row">
                 <h1>{{teacher.username}}</h1>
                 <h6 style="color: white;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"
@@ -65,7 +70,7 @@
             </div>
 
             <div class="row d-flex flex-column gap-3">
-                <h2>Students</h2>
+                <h2>Students Enrolled</h2>
                 <hr
                     style="height:2px; width:100%; border-width:0; color:rgb(107, 107, 107); background-color:rgb(107, 107, 107) ; padding-left: 12px;" />
                 {% if teacher.students %}
