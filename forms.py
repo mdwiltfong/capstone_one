@@ -35,7 +35,8 @@ class SubscriptionPlan(FlaskForm):
     plan = RadioField("Subscription Options",choices=[('price_1KNUuRDBo40mpW7dT4BG7Kzl','Basic Plan'),('price_1KNUv7DBo40mpW7dDF2Vuq81',"Premium Plan")])
 
 class TeacherInvoice(FlaskForm):
-    student_name=StringField("Student Name", validators=[InputRequired()])
+    first_name=StringField("Student First Name", validators=[InputRequired()])
+    last_name=StringField("Student Last Name", validators=[InputRequired()])
     student_email=StringField("Student Email",validators=[InputRequired(),Email()])
     service_field=StringField("Service",validators=[InputRequired()])
     hourly_rate=DecimalField("Hourly Rate",validators=[InputRequired()])
