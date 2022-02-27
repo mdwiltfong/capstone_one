@@ -194,8 +194,7 @@ class Student(db.Model):
     )
     email = db.Column(
         db.Text,
-        nullable=False,
-        unique=True,
+        nullable=False
     )
     username = db.Column(
         db.Text,
@@ -214,25 +213,31 @@ class Student(db.Model):
     @classmethod
     def signup(cls,form,teacher):
 
-        new_student=Student(
-            email=form.student_email.data,
-            name=form.first_name.data + " " + form.last_name.data,
-            subscription_status='incomplete'
-        )
-        customer=stripe.Customer.create(
-                email=new_student.email,
-                name=form.first_name.data + " " + form.last_name.data,
-                metadata={
-                    "username": new_student.username,
-                    "db_id":new_student.id,
-                    "customer_type":"student"
-                },
-                stripe_account=teacher.account_id
+        try: 
+            for student in teacher.students:
+                if form.student_email.data == student.email:
+                    raise Exception("Student already added")
+            new_student=Student(
+                email=form.student_email.data,
+                name=form.student_name.data,
+                subscription_status='incomplete'
+
             )
-        new_student.stripe_id=customer.id
-        new_student.teacher.append(teacher)
-        db.session.add(new_student)
-        db.session.commit()
+            customer=stripe.Customer.create(
+                    email=new_student.email,
+                    metadata={
+                        "username": new_student.username,
+                        "db_id":new_student.id,
+                        "customer_type":"student"
+                    },
+                    stripe_account=teacher.account_id
+                )
+            new_student.stripe_id=customer.id
+            new_student.teacher.append(teacher)
+            db.session.add(new_student)
+            db.session.commit()
+        except Exception as e:
+            return None
         return new_student
 
     @classmethod
@@ -311,6 +316,11 @@ class Student(db.Model):
         student.subscription_status=data_object["status"]
         db.session.add(student)
         db.session.commit()
+    
+    @classmethod
+    def student_teacher(cls):
+        x = db.session.query(Student.email).join(Teacher_Student).all()
+        print(x)
 
 class Quote(db.Model):
     __tablename__="quotes"
@@ -341,6 +351,8 @@ class Quote(db.Model):
     total=db.Column(
         db.Integer
     )
+
+    
 
     def __repr__(self):
         return f"<Quote #{self.id}: {self.teacher_id}, {self.student_id}>"
