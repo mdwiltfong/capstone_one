@@ -77,13 +77,12 @@
 
                     {% for student in teacher.students %}
                     {% if student.quote and student.quote[0].quote_status != 'accepted' %}
-                    <li style="width:auto" class="list-group-item"><a
-                            href="/student/{{student.is}}/profile">{{student.name}}</a> -
+                    <li style="width:auto" class="list-group-item">{{student.name}} ({{student.email}})
                         <div class="badge alert-secondary d-inline">Quote Status : {{student.quote[0].quote_status}}
                         </div>
                     </li>
                     {% else %}
-                    <li class="list-group-item"><a href="/student/{{student.is}}/profile">{{student.name}}</a> - <div
+                    <li class="list-group-item">{{student.name}} ({{student.email}}) <div
                             class="badge alert-primary d-inline">Enrollment:
                             {{student.subscription_status}}</div>
                     </li>

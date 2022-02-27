@@ -55,10 +55,6 @@ a {
 .hidden {
   display: none;
 }
-.container {
-  background-color: #ffffff;
-  opacity: 20%;
-}
 
 #enroll {
   border-radius: 5px;
