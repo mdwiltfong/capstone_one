@@ -110,16 +110,22 @@ def teacher_invoice():
         return redirect("/")
     teacher=Teacher.query.filter_by(account_id=session["curr_user"]).first()
     if form.validate_on_submit():
-        new_student=Student.signup(form,teacher)
-        quote=Student.create_quote(new_student,form,session["curr_user"])
-        #resp= Student.create_subscription(new_student.stripe_id,form,session["curr_user"])
-        if quote.get("error",False):
-            flash("There was an issue making the Invoice","danger")
-            return redirect(f'/teacher/{teacher.account_id}/profile')
+        try:
+            new_student=Student.signup(form,teacher)
+            if new_student is None:
+                raise Exception("Student already added")
+            quote=Student.create_quote(new_student,form,session["curr_user"])
+            #resp= Student.create_subscription(new_student.stripe_id,form,session["curr_user"])
+            if quote.get("error",False):
+                flash("There was an issue making the Invoice","danger")
+                return redirect(f'/teacher/{teacher.account_id}/profile')
 
-        #flash("Invoice Sent","success")
-        #return redirect(f'/teacher/{teacher.account_id}/profile')
-        return redirect("/teacher/quote/download")
+            #flash("Invoice Sent","success")
+            #return redirect(f'/teacher/{teacher.account_id}/profile')
+            return redirect("/teacher/quote/download")
+        except Exception as e:
+            flash("Student Already Added", "danger")
+            return redirect(f'/teacher/{teacher.account_id}/profile')
     return render_template("invoice_form.html",form=form,teacher=teacher)
 
 @app.route("/teacher/quote/download")
