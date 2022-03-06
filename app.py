@@ -17,7 +17,7 @@ DOMAIN="http://127.0.0.1:5000"
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    os.environ.get('DATABASE_URL', 'postgresql:///teach'))
+    os.environ.get('DATABASE_URL', 'postgres://dmyyrvivasbrip:7559b23f0db0376128cbb1b11e9b50e292c876e44bf4bd54484511671d37524e@ec2-54-83-21-198.compute-1.amazonaws.com:5432/d5ce0n4jksrv8s'))
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
