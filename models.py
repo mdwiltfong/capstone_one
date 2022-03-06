@@ -223,6 +223,7 @@ class Student(db.Model):
                 subscription_status='incomplete'
 
             )
+
             customer=stripe.Customer.create(
                     email=new_student.email,
                     metadata={
@@ -238,7 +239,7 @@ class Student(db.Model):
             db.session.commit()
         except Exception as e:
             print(e.message);
-            return None
+            return e
         return new_student
 
     @classmethod
