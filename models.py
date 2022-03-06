@@ -223,7 +223,7 @@ class Student(db.Model):
                 subscription_status='incomplete'
 
             )
-
+            print(new_student);
             customer=stripe.Customer.create(
                     email=new_student.email,
                     metadata={
