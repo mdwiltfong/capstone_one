@@ -237,6 +237,7 @@ class Student(db.Model):
             db.session.add(new_student)
             db.session.commit()
         except Exception as e:
+            print(e.message);
             return None
         return new_student
 
