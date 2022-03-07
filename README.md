@@ -1,25 +1,13 @@
-# How to Run repo
+What is Teacher Pay?
 
-1. Make sure you are in a virtual enviornment. Run the following code in your terminal.
+Teacher Pay was made by me, Michael Wiltfong. At the beginning of the COVID-19 pandemic, practically every school in Canada had ceased in-person classefa-spin and switched to online learning. Suddenly everyone was usuing Zoom, and the world began heavily relying on technology and the internet to interact with each other. Teacher Pay is a solution for private tutors to interact with their students and easily deal with invoicing and quotes when it comes to offering their services.
 
-   - `source venv/bin/activate`
+Using Stripe's API, Teacher Pay is able to generate detailed quotes that help tutors portray their most professional self to their clients. Once a quote is accepted and paid for, the tutor no longer has to worry about monthly (or weekly) biling since it will be handled by Teacher pay. Teacher Pay is also a safe and secure platform for handling transactions. All credit card, and bank information is actually sent directly to Stripe. This way, teachers and parents don't have to worry about where their information is being sent to. This also includes the actual processing of payments.
 
-2. You may need to add variables to PATH. Put this in your terminal.
+You can explore the app through this test account and the following bogus credit cards:
 
-   - ` export FLASK_ENV=development`
+username: testTeacher
+password: 123456
 
-3. Now you're ready to run the flask server.
-
-   - ` flask run`
-
-At this point your terminal is running a flask server. You should be able to see the site at `http://127.0.0.1:5000/`
-
-## How to Refresh DB tables
-
-In some cases you may have to refresh your db models. You can follow this procedure to do so. Keep in mind you will have to be in a virtual enviornment while running the flask server:
-
-1. Open iPython by running `ipython`
-2. Run `%run app.py`
-3. Drop all tables by running `db.drop_all()` If you are getting errors at this point you may have to mainly drop some tables.
-4. Run `db.create_all()`
-5. You've created the tables but they're empty. You will have to run the seed file by executing `%run seed.py`
+Successful Payment: 4242424242424242
+Failed payment: 4000000000009995
