@@ -9,7 +9,7 @@ Homepage
 {% for category, msg in get_flashed_messages(with_categories=true) %}
 <!--TODO #13 @AndreaDubuc Look at possibly having these messages slide on and off the screen through animations-->
 <div class="container d-flex justify-content-center">
-    <p class="w-25 alert alert-{{category}}">{{msg}}</p>
+    <p class="w-auto p-25 alert text-center alert-{{category}}">{{msg}}</p>
 </div>
 {% endfor %}
 
@@ -29,7 +29,7 @@ Homepage
         <div class="container p-0">
             <h1 class="" style="font-size: 90px ">Teacher Pay</h1>
         </div>
-        <!-- TODO `Teacher Pay` and below text are off centered. `Teacher Pay` might have some sort of padding or margin on it's left -->
+
         <div class="container">
             <p style="color: white;">
                 Teacher Pay is an invoice app that saves you time, gets you paid, and makes managing students
@@ -38,7 +38,6 @@ Homepage
 
             </p>
             <span class="w-25">
-                <!-- TODO Re-align `sign up` button  -->
                 <a href="/teacher/signup" class="btn">Sign up</a>
 
             </span>
