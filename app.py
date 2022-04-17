@@ -192,7 +192,7 @@ def handle_quote():
         
         setupIntent=stripe.SetupIntent.create(
             customer=session["student_id"],
-            payment_method_types=["bancontact", "card", "ideal"],
+            payment_method_types=["card"],
             stripe_account=session["account_id"]
             )
 

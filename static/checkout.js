@@ -1,6 +1,4 @@
 let stripe, clientSecret, elements, cardElement;
-require("dotenv").config();
-const DOMAIN = process.env.DOMAIN;
 window.addEventListener("DOMContentLoaded", () => {
   getConfig().then(() => {
     const appearance = {
@@ -58,12 +56,13 @@ const setMessage = (message) => {
 const form = document.querySelector("#payment-form");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   // Create payment method and confirm payment intent.
   stripe
     .confirmSetup({
       elements,
       confirmParams: {
-        return_url: DOMAIN + "/checkout_successful",
+        return_url: "http://127.0.0.1:5000/checkout_successful",
       },
     })
     .then((result) => {
