@@ -44,7 +44,7 @@ form.addEventListener("submit", async (e) => {
     .confirmSetup({
       elements,
       confirmParams: {
-        return_url: "/checkout_successful",
+        return_url: "http://127.0.0.1:5000/checkout_successful",
       },
     })
     .then((result) => {
