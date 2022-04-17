@@ -2,27 +2,9 @@ let stripe, clientSecret, elements, cardElement;
 window.addEventListener("DOMContentLoaded", () => {
   getConfig().then(() => {
     const appearance = {
-      iconStyle: "solid",
-      style: {
-        base: {
-          iconColor: "#fff",
-          color: "#fff",
-          fontWeight: 400,
-          fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
-          fontSize: "16px",
-          fontSmoothing: "antialiased",
-
-          "::placeholder": {
-            color: "#BFAEF6",
-          },
-          ":-webkit-autofill": {
-            color: "white",
-          },
-        },
-        invalid: {
-          iconColor: "#FFC7EE",
-          color: "#FFC7EE",
-        },
+      theme: "stripe",
+      variables: {
+        colorText: "#cdd0f8",
       },
     };
 
