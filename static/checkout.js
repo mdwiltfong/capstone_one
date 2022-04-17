@@ -5,6 +5,7 @@ window.addEventListener("DOMContentLoaded", () => {
       theme: "stripe",
       variables: {
         colorText: "#cdd0f8",
+        colorDanger: "#16db93",
       },
     };
 
@@ -29,7 +30,7 @@ const setMessage = (message) => {
   const messageDiv = document.querySelector("#messages");
   if (message.error) {
     messageDiv.className += " w-25 alert alert-danger";
-    messageDiv.innerHTML += message.error.message;
+    messageDiv.innerHTML += message.error.type;
   } else {
     messageDiv.className = "w-25 alert alert-success";
     messageDiv.innerHTML += message;
