@@ -1,6 +1,4 @@
 let stripe, clientSecret, elements, cardElement;
-require("dotenv").config();
-const DOMAIN = process.env.DOMAIN;
 window.addEventListener("DOMContentLoaded", () => {
   getConfig().then(() => {
     const appearance = {
