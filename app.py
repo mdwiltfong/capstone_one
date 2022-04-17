@@ -229,13 +229,6 @@ def checkout():
         },
         stripe_account=session["account_id"]
     )
-    """
-    stripe.Invoice.finalize_invoice(
-        quoteResp["invoice"],
-        auto_advance=True,
-        stripe_account=session["account_id"]
-        )
-    """
     return redirect("/")
 
 @app.route("/teacher/<account_id>/profile",methods=["GET","POST"])
