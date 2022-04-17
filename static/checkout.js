@@ -61,7 +61,7 @@ form.addEventListener("submit", async (e) => {
     .confirmSetup({
       elements,
       confirmParams: {
-        return_url: DOMAIN + "/checkout_successful",
+        return_url: "/checkout_successful",
       },
     })
     .then((result) => {
