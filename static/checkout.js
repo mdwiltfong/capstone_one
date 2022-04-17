@@ -1,5 +1,6 @@
 let stripe, clientSecret, elements, cardElement;
-
+require("dotenv").config();
+const DOMAIN = process.env.DOMAIN;
 window.addEventListener("DOMContentLoaded", () => {
   getConfig().then(() => {
     const appearance = {
@@ -28,7 +29,7 @@ window.addEventListener("DOMContentLoaded", () => {
     };
 
     elements = stripe.elements({ clientSecret, appearance });
-    cardElement = elements.create("card", appearance);
+    cardElement = elements.create("payment", appearance);
     cardElement.mount("#payment-element");
   });
 });
@@ -57,32 +58,13 @@ const setMessage = (message) => {
 const form = document.querySelector("#payment-form");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  const nameInput = document.getElementById("name");
-  const emailInput = document.getElementById("email");
-  const phoneInput = document.getElementById("phone");
-  const addressInput = document.getElementById("address");
-  const cityInput = document.getElementById("city");
-  const stateInput = document.getElementById("state");
-  const zipInput = document.getElementById("zip");
   // Create payment method and confirm payment intent.
   stripe
-    .confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: cardElement,
-        billing_details: {
-          name: nameInput.value,
-          email: emailInput.value,
-          address: {
-            city: cityInput.value,
-            line1: addressInput.value,
-            postal_code: zipInput.value,
-            state: stateInput.value,
-          },
-          phone: phoneInput.value,
-        },
+    .confirmSetup({
+      elements,
+      confirmParams: {
+        return_url: DOMAIN + "/checkout_successful",
       },
-      setup_future_usage: "off_session",
     })
     .then((result) => {
       if (result.error) {

@@ -1,11 +1,12 @@
 
+from locale import currency
 import os
 import pdb
 from flask import Flask, render_template, flash, redirect, session, jsonify,request,send_file
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import Teacher, Student,db,connect_db,Quote
-from forms import AddCustomer,StudentLogin, SubscriptionPlan,TeacherInvoice,QuoteForm
+from forms import AddCustomer,StudentLogin,TeacherInvoice,QuoteForm
 from helper_functions import convert_quote
 import stripe
 import json
@@ -116,13 +117,11 @@ def teacher_invoice():
             if new_student is None:
                 raise Exception("Student already added")
             quote=Student.create_quote(new_student,form,session["curr_user"])
-            #resp= Student.create_subscription(new_student.stripe_id,form,session["curr_user"])
             if quote.get("error",False):
                 flash("There was an issue making the Invoice","danger")
                 return redirect(f'/teacher/{teacher.account_id}/profile')
 
-            #flash("Invoice Sent","success")
-            #return redirect(f'/teacher/{teacher.account_id}/profile')
+          
             return redirect("/teacher/quote/download")
         except Exception as e:
             flash("Student Already Added", "danger")
@@ -163,10 +162,11 @@ def quote_list():
     if form.validate_on_submit():
 
         data=request.form
-        student_email=data["student_email"]
-        student_name=data["student_name"]
+        student_email='%' + data['student_email']+'%'
         try:
-            student=Student.query.filter(Student.email==student_email,Student.name==student_name).first()
+            student=Student.query.filter(Student.email.like(student_email)).first()
+            if (student.quote[0].quote_status=='accepted'):
+                raise Exception
             quote=stripe.Quote.retrieve(student.quote[0].stripeid,
             stripe_account=student.teacher[0].account_id
             )   
@@ -175,27 +175,29 @@ def quote_list():
             )
             description=line_items["data"][0]['description']
             session["quote_id"]=quote["id"]
+            session["quote_amount"]=quote["amount_total"]
             session["account_id"]=student.teacher[0].account_id
+            session["student_id"]=student.stripe_id
             if student is None:
                 raise Exception
             return render_template("convert_quote.html",form=form,quote=quote,student=student,description=description)
         except Exception as e:
-            flash("Hmm, there was an issue looking up your quote", "danger")
+            flash("There are no open quotes for this student", "danger")
             return redirect("/convert_quote")
     return render_template("convert_quote.html",form=form)
 
-@app.route("/handle_quote",methods=["post","get"])
+@app.route("/handle_quote",methods=["post"])
 def handle_quote():
-    #TODO We are creating subscriptions and quotes on the connected account. We should gather customer payment info for charging them later. 
     try:
-        resp=stripe.Quote.accept(session["quote_id"],
-        stripe_account=session["account_id"]   
-        )
-        invoice=stripe.Invoice.finalize_invoice(resp["invoice"],
-        stripe_account=session["account_id"],
-            expand=["payment_intent"]
-        )
-        session["client_secret"]=invoice["payment_intent"]["client_secret"]
+        
+        setupIntent=stripe.SetupIntent.create(
+            customer=session["student_id"],
+            payment_method_types=["bancontact", "card", "ideal"],
+            stripe_account=session["account_id"]
+            )
+
+   
+        session["client_secret"]=setupIntent['client_secret']
     except Exception as e:
         flash("There was an issue accepting the quote","danger")
         redirect("/handle_quote")
@@ -214,6 +216,15 @@ def config_details():
 @app.route("/checkout_successful",methods=["GET","POST"])
 def checkout():
     flash("Payment Successful","success")
+    quoteResp=stripe.Quote.accept(
+        session["quote_id"],
+        stripe_account=session["account_id"]
+        )
+    stripe.Invoice.finalize_invoice(
+        quoteResp["invoice"],
+        auto_advance=True,
+        stripe_account=session["account_id"]
+        )
     return redirect("/")
 
 @app.route("/teacher/<account_id>/profile",methods=["GET","POST"])

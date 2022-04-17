@@ -41,7 +41,7 @@ Invoice
                 </form>
                 {% if quote and student %}
                 <div class="container my-5 w-50" id="quote_list" style="min-height: 500px;">
-                    <form action="/handle_quote" method="GET" class="card">
+                    <form action="/handle_quote" method="POST" class="card">
                         <div class="card-header">
                             {{student.name}}
                         </div>
