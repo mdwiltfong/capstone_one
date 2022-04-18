@@ -1,5 +1,8 @@
 let stripe, clientSecret, elements, cardElement;
 const DOMAIN = window.location.href;
+
+import { lineItem, Quote } from "./quote.js";
+
 window.addEventListener("DOMContentLoaded", () => {
   getConfig().then(() => {
     const appearance = {

@@ -3,7 +3,7 @@ block stylesheet %}
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 <link rel="stylesheet" href="{{ url_for('static', filename='checkout.css') }}" />
 {% endblock stylesheet %} {% block script %}
-<script src="{{ url_for('static', filename='checkout.js') }}" defer></script>
+<script type="module" src="{{ url_for('static', filename='checkout.js') }}" defer></script>
 {% endblock script %} {% block content %}
 <span style="min-height:82px" class="container d-flex justify-content-center" id="messages"></span>
 <div class="cell example example5" id="example-5" style="max-width:40%; margin: 0 auto">
