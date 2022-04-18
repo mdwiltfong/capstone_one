@@ -1,4 +1,5 @@
 let stripe, clientSecret, elements, cardElement;
+const DOMAIN = window.location.href;
 window.addEventListener("DOMContentLoaded", () => {
   getConfig().then(() => {
     const appearance = {
@@ -44,7 +45,7 @@ form.addEventListener("submit", async (e) => {
     .confirmSetup({
       elements,
       confirmParams: {
-        return_url: "http://127.0.0.1:5000/checkout_successful",
+        return_url: new URL("/checkout_successful", DOMAIN).toString(),
       },
     })
     .then((result) => {
