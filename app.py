@@ -195,7 +195,7 @@ def handle_quote():
             payment_method_types=["bancontact", "card", "ideal"],
             stripe_account=session["account_id"]
             )
-
+        session["setupIntent_id"]=setupIntent["id"]
    
         session["client_secret"]=setupIntent['client_secret']
     except Exception as e:
@@ -220,11 +220,15 @@ def checkout():
         session["quote_id"],
         stripe_account=session["account_id"]
         )
-    stripe.Invoice.finalize_invoice(
-        quoteResp["invoice"],
-        auto_advance=True,
+    setup_intent=stripe.SetupIntent.retrieve(session["setupIntent_id"],stripe_account=session["account_id"])
+   
+    stripe.Customer.modify(
+        session["student_id"],
+        invoice_settings={
+            "default_payment_method":setup_intent.payment_method
+        },
         stripe_account=session["account_id"]
-        )
+    )
     return redirect("/")
 
 @app.route("/teacher/<account_id>/profile",methods=["GET","POST"])

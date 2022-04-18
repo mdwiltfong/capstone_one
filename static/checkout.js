@@ -1,28 +1,12 @@
 let stripe, clientSecret, elements, cardElement;
+const DOMAIN = window.location.href;
 window.addEventListener("DOMContentLoaded", () => {
   getConfig().then(() => {
     const appearance = {
-      iconStyle: "solid",
-      style: {
-        base: {
-          iconColor: "#fff",
-          color: "#fff",
-          fontWeight: 400,
-          fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
-          fontSize: "16px",
-          fontSmoothing: "antialiased",
-
-          "::placeholder": {
-            color: "#BFAEF6",
-          },
-          ":-webkit-autofill": {
-            color: "white",
-          },
-        },
-        invalid: {
-          iconColor: "#FFC7EE",
-          color: "#FFC7EE",
-        },
+      theme: "stripe",
+      variables: {
+        colorText: "#cdd0f8",
+        colorDanger: "#16db93",
       },
     };
 
@@ -47,7 +31,7 @@ const setMessage = (message) => {
   const messageDiv = document.querySelector("#messages");
   if (message.error) {
     messageDiv.className += " w-25 alert alert-danger";
-    messageDiv.innerHTML += message.error.message;
+    messageDiv.innerHTML += message.error.type;
   } else {
     messageDiv.className = "w-25 alert alert-success";
     messageDiv.innerHTML += message;
@@ -61,7 +45,7 @@ form.addEventListener("submit", async (e) => {
     .confirmSetup({
       elements,
       confirmParams: {
-        return_url: "/checkout_successful",
+        return_url: new URL("/checkout_successful", DOMAIN).toString(),
       },
     })
     .then((result) => {

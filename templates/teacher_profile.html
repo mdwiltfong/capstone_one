@@ -83,9 +83,18 @@
                         </div>
                     </li>
                     {% else %}
-                    <li class="list-group-item">{{student.name}} ({{student.email}}) <div
-                            class="badge alert-primary d-inline">Enrollment:
-                            {{student.subscription_status}}</div>
+                    <li class="list-group-item">
+                        {{student.name}} ({{student.email}})
+                        {% if student.subscription_status == 'active' %}
+                        <div class="badge alert-primary d-inline">
+                            Enrollment:{{student.subscription_status}}
+                        </div>
+                        {% else %}
+                        <div class="badge alert-danger d-inline">
+                            Enrollment:{{student.subscription_status}}
+                        </div>
+                        {% endif %}
+
                     </li>
 
                     {% endif %}
