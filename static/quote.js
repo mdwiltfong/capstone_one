@@ -1,5 +1,7 @@
+/* Only use NodeJs implementation for testing */
+const Dinero = require("dinero.js");
 class lineItem {
-  constructor({ price, quantity, salesTax }) {
+  constructor({ price, quantity = 1, salesTax }) {
     (this.price = price),
       (this.quantity = quantity),
       (this.salesTax = salesTax);
@@ -14,13 +16,32 @@ class lineItem {
 }
 
 class Quote {
-  constructor(...lineItems) {
+  constructor(lineItems, discount) {
     this.lineItems = lineItems;
+    this.discount = discount;
+    this.subTotal;
   }
-  numberToDinero() {
+  /* Converts line items into dinero objects in which the dinero object amount is the line item total without sales tax or discount  */
+  get dineroLineItems() {
     return this.lineItems.map((lineItem) => {
-      return Dinero({ amount: lineItem.price, currency: "USD" });
+      return Dinero({
+        amount: lineItem.price * lineItem.quantity * 100,
+        currency: "USD",
+      });
     });
+  }
+
+  get dineroSubTotal() {
+    return (this.subTotal = this.dineroLineItems.reduce(
+      (preValue, currValue) => {
+        return preValue.add(currValue);
+      }
+    ));
+  }
+  get dineroSubTotalDiscounted() {
+    if (this.discount.percentage == false) {
+      return this.dineroLineItems.map(() => {});
+    }
   }
 }
 
