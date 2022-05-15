@@ -11,3 +11,18 @@ password: 123456
 
 Successful Payment: 4242424242424242
 Failed payment: 4000000000009995
+
+
+This app uses a variety of backend languages. Such as: 
+
+- Flask (Python)
+- What The Forms
+- SQL ALchemy
+- PSQL
+- Jninja
+- Flask-Debugtoolbar
+
+If you'd like to run this machine locally, its recommended you do the following:
+- Create a virtual enviornment `python 3 -m venv venv` 
+- Then install all dependancies `pip install -r requirements.txt` 
+- Then run the server in development mode `FLASK_ENV=development flask run` 
