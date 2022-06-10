@@ -26,6 +26,11 @@
   {% endblock stylesheet %}
   <title>{% block title %} {% endblock title %}</title>
   <script src="https://kit.fontawesome.com/c18557e782.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dinero.js/1.0.4/dinero.js"></script>
+  <script>
+    Dinero()
+  </script>
+  <script type="module" src="{{ url_for('static', filename='quote.js') }}"></script>
 </head>
 
 <body>
